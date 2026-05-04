@@ -8,15 +8,15 @@
         /* GitHub Stili Renk Paleti */
         :root[data-theme="light"] {
             --bg-body: #f6f8fa; --bg-panel: #ffffff; --text-main: #24292f; --text-muted: #57606a;
-            --border: #d0d7de; --primary: #0969da; --secondary: #f3f4f6;
-            --secondary-hover: #ebecf0; --success: #2da44e; --danger: #cf222e; --warning: #bf8700;
+            --border: #d0d7de; --primary: #0969da; --secondary: #f3f4f6; --secondary-hover: #ebecf0;
+            --success: #2da44e; --danger: #cf222e; --warning: #bf8700;
             --highlight-yellow: #fff8c5; --highlight-purple: #f3f0ff; --purple-text: #8250df;
             --shadow: 0 3px 6px rgba(140,149,159,0.15);
         }
         :root[data-theme="dark"] {
             --bg-body: #0d1117; --bg-panel: #161b22; --text-main: #c9d1d9; --text-muted: #8b949e;
-            --border: #30363d; --primary: #58a6ff; --secondary: #21262d;
-            --secondary-hover: #30363d; --success: #3fb950; --danger: #f85149; --warning: #d29922;
+            --border: #30363d; --primary: #58a6ff; --secondary: #21262d; --secondary-hover: #30363d;
+            --success: #3fb950; --danger: #f85149; --warning: #d29922;
             --highlight-yellow: rgba(210, 153, 34, 0.15); --highlight-purple: rgba(130, 80, 223, 0.15);
             --purple-text: #bc8cff; --shadow: 0 3px 6px rgba(0,0,0,0.4);
         }
@@ -34,11 +34,15 @@
         .theme-toggle { background: var(--secondary); color: var(--text-main); }
         .btn-cloud.save { background: #0550ae; color: white; border-color: #0550ae; }
         .btn-cloud.load { background: #2da44e; color: white; border-color: #2da44e; }
-        
+        .btn-cloud.new-test { background: var(--secondary); color: var(--primary); border-color: var(--border); }
+
         .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .input-group { display: flex; flex-direction: column; }
         .input-group label { font-weight: 600; margin-bottom: 6px; font-size: 12px; }
         .input-group input, .input-group select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--bg-body); color: var(--text-main); outline: none;}
+        
+        /* Readonly Stil Ayarı */
+        input[readonly] { background-color: var(--secondary); cursor: not-allowed; border-color: transparent; }
         .uid-input { font-family: monospace; font-weight: 600; color: var(--primary); }
         .sira-input { font-size: 16px; font-weight: bold; color: var(--success); text-align: center; }
 
@@ -80,6 +84,18 @@
         .spinner { border: 4px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 4px solid #fff; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* YENİ: Liste Seçim Modalı */
+        #listModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--bg-panel); color: var(--text-main); width: 90%; max-width: 600px; max-height: 80vh; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid var(--border); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; }
+        .modal-close { background: transparent; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; }
+        .modal-close:hover { color: var(--danger); }
+        .record-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
+        .record-item { background: var(--secondary); padding: 15px; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+        .record-item:hover { border-color: var(--primary); box-shadow: inset 3px 0 0 var(--primary); }
+        .record-item .r-uid { font-family: monospace; font-weight: bold; color: var(--primary); font-size: 15px; }
+        .record-item .r-info { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
+
         .print-only { display: none; }
         .print-text { display: none; }
         
@@ -109,11 +125,24 @@
 
 <div id="loadingOverlay">
     <div class="spinner"></div>
-    <div>Bulut ile senkronize ediliyor...</div>
+    <div id="loadingText">Bulut ile senkronize ediliyor...</div>
+</div>
+
+<!-- KAYIT SEÇİM MODALI -->
+<div id="listModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="margin:0; font-size:18px;">📋 Kayıtlı Testler (Arşiv)</h2>
+            <button class="modal-close" onclick="closeListModal()">&times;</button>
+        </div>
+        <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Devam etmek istediğiniz hastanın kaydına tıklayın. Liste yeniden eskiye doğru sıralanmıştır.</div>
+        <div class="record-list" id="recordListContainer">
+            <!-- Kayıtlar buraya JS ile yüklenecek -->
+        </div>
+    </div>
 </div>
 
 <div class="container" id="dashboardView">
-    <!-- Baskı Görünümü Başlıkları (Sıra No ve Protokol) -->
     <div class="print-only">
         <h1 style="margin:0;">Öktem-SBST Test Raporu</h1>
         <div style="display:flex; justify-content:space-between; margin-top:10px;">
@@ -126,7 +155,8 @@
     <div class="top-bar no-print">
         <h2 style="font-size: 20px;">Klinik Kayıt Paneli</h2>
         <div class="cloud-actions">
-            <button class="btn-cloud load" onclick="loadFromCloud()">☁️ Çağır</button>
+            <button class="btn-cloud new-test" onclick="createNewTest()">➕ Yeni</button>
+            <button class="btn-cloud load" onclick="fetchRecordsList()">☁️ Çağır</button>
             <button class="btn-cloud save" onclick="saveToCloud()">☁️ Kaydet</button>
             <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌗 Tema</button>
         </div>
@@ -136,15 +166,14 @@
         <b>Bulut Durumu:</b> <span id="lastModText">Henüz buluta kaydedilmedi.</span>
     </div>
 
-    <!-- UI Görünümü Girdileri (Sıra No solda, UID sağda) -->
     <div class="header-grid">
         <div class="input-group">
             <label>Sıra No:</label>
-            <input type="number" id="siraNo" class="sira-input" title="Otomatik artar, gerekirse düzeltebilirsiniz.">
+            <input type="text" id="siraNo" class="sira-input" readonly title="Sıra numarası sadece kaydedildiğinde artar.">
         </div>
         <div class="input-group">
             <label>Protokol ID:</label>
-            <input type="text" id="displayUID" class="uid-input" title="Teste devam etmek için buraya eski ID'yi yapıştırıp Çağır'a basın.">
+            <input type="text" id="displayUID" class="uid-input" readonly title="ID otomatik oluşturulur, değiştirilemez.">
         </div>
         <div class="input-group no-print">
             <label>Uygulayan / Değiştiren:</label>
@@ -227,7 +256,7 @@
 </div>
 
 <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXBeArILDETklbygYXgA4pIHGk8EkfPSzKQZz3Ywk_obrh0tulisSC6gBWIbqMKIZM/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLFBwOMrX33ePXgSG8GBHApy7oAc6n9Tj3H76Xh6aLYYxB0irP8Ai5OTtJuHY0yQNn/exec";
 
     function toggleTheme() {
         const root = document.documentElement;
@@ -250,11 +279,34 @@
         return `SBST-${p1}-${p2}`;
     }
 
-    function getNextSequenceNumber() {
+    let isNewRecordSaved = false; // Sıra numarasını boş yere artırmamak için kontrol bayrağı
+
+    function setupNewTest() {
+        // Formu temizle
+        document.getElementById('pAge').value = "";
+        document.getElementById('pEdu').value = "";
+        document.getElementById('digitSpan').value = "";
+        document.getElementById('lastModifiedBar').style.display = "none";
+        
+        // Yeni ID oluştur
+        document.getElementById('displayUID').value = generateAlphaNumericID();
+        document.getElementById('pDate').valueAsDate = new Date();
+        
+        // Sıra No sadece ön izleme olarak tutulur, kaydedilince asıl numara atanır.
         let seq = parseInt(localStorage.getItem('sbstSequence')) || 0;
-        seq = seq + 1;
-        localStorage.setItem('sbstSequence', seq);
-        return seq;
+        document.getElementById('siraNo').value = `(Kayıtta: ${seq + 1})`;
+        isNewRecordSaved = false;
+
+        // Verileri sıfırla
+        testData = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "USB":{}, "TANIMA":{} };
+        intrusions = { 1:"", 2:"", 3:"", 4:"", 5:"", 6:"", 7:"", 8:"", 9:"", 10:"", "USB":"" };
+        updateUIFromData();
+    }
+
+    function createNewTest() {
+        if(confirm("Mevcut veriler silinip yeni bir test oturumu açılacak. Emin misiniz?")) {
+            setupNewTest();
+        }
     }
 
     const words = [
@@ -283,11 +335,7 @@
         const savedTheme = localStorage.getItem('sbstTheme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         document.getElementById('themeBtn').innerHTML = savedTheme === 'dark' ? '☀️ Açık Tema' : '🌗 Koyu Tema';
-
         document.getElementById('assessorName').value = localStorage.getItem('sbstAssessor') || "";
-        document.getElementById('displayUID').value = generateAlphaNumericID();
-        document.getElementById('pDate').valueAsDate = new Date();
-        document.getElementById('siraNo').value = getNextSequenceNumber();
 
         const headers = document.getElementById('tableHeaders');
         const tbody = document.getElementById('mainTableBody');
@@ -297,7 +345,6 @@
             headers.innerHTML += `<th><span class="print-text">${i}</span><button class="btn-start no-print" onclick="startTrial(${i})">D${i}</button></th>`;
             intRow.innerHTML += `<td id="int-${i}"></td>`;
         }
-        
         intRow.innerHTML += `<td id="int-USB" style="background:var(--highlight-yellow);"></td><td style="background:var(--highlight-purple);"></td>`;
 
         words.forEach((w, idx) => {
@@ -307,6 +354,8 @@
             r += `<td id="c-TANIMA-${idx}" style="background:var(--highlight-purple); font-weight:bold;"></td></tr>`;
             tbody.innerHTML += r;
         });
+
+        setupNewTest();
     };
 
     function startTrial(key) {
@@ -382,10 +431,8 @@
             document.getElementById(`int-${key}`).innerText = intrusions[key] || "";
             words.forEach((w, i) => document.getElementById(`c-${key}-${i}`).innerText = testData[key][i] || "");
         }
-        
         document.getElementById(`int-USB`).innerText = intrusions["USB"] || "";
         words.forEach((w, i) => document.getElementById(`c-USB-${i}`).innerText = testData["USB"][i] || "");
-
         words.forEach((w, i) => {
             let target = targetWordsUpper[i];
             let gIdx = triplets.findIndex(g => g.includes(target));
@@ -394,7 +441,6 @@
             cell.innerText = sel === target ? "+T" : (sel ? "-Y" : "");
             cell.style.color = sel === target ? "var(--success)" : "var(--danger)";
         });
-
         calculateScores();
     }
 
@@ -417,25 +463,35 @@
     }
 
     function preparePrint() {
-        document.getElementById('printSira').innerText = document.getElementById('siraNo').value;
+        let siraText = document.getElementById('siraNo').value;
+        document.getElementById('printSira').innerText = siraText.replace("(Kayıtta: ", "").replace(")", "");
         document.getElementById('printUID').innerText = document.getElementById('displayUID').value;
         document.getElementById('printAssessor').innerText = document.getElementById('assessorName').value || "......................";
         window.print();
     }
 
+    // --- BULUT İŞLEMLERİ ---
+
     function saveToCloud() {
-        //if(GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwXBeArILDETklbygYXgA4pIHGk8EkfPSzKQZz3Ywk_obrh0tulisSC6gBWIbqMKIZM/exec") return alert("Lütfen URL ayarını yapın.");
+        if(GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") return alert("Lütfen URL ayarını yapın.");
 
         const uid = document.getElementById('displayUID').value.trim();
-        if(!uid) return alert("Hata: Protokol ID boş olamaz.");
-        
         const assessor = document.getElementById('assessorName').value;
         localStorage.setItem('sbstAssessor', assessor);
 
+        document.getElementById('loadingText').innerText = "Kaydediliyor...";
         document.getElementById('loadingOverlay').style.display = "flex";
         
-        const timestamp = new Date().toLocaleString('tr-TR');
+        // Eğer bu kayıt daha önce hiç kaydedilmediyse sıra numarasını şimdi ver.
+        if(!isNewRecordSaved && document.getElementById('siraNo').value.includes("Kayıtta")) {
+            let seq = parseInt(localStorage.getItem('sbstSequence')) || 0;
+            seq = seq + 1;
+            localStorage.setItem('sbstSequence', seq);
+            document.getElementById('siraNo').value = seq;
+            isNewRecordSaved = true;
+        }
 
+        const timestamp = new Date().toLocaleString('tr-TR');
         const payload = {
             action: "save",
             uid: uid,
@@ -455,35 +511,86 @@
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
-        })
-        .then(() => {
+        }).then(() => {
             document.getElementById('loadingOverlay').style.display = "none";
             document.getElementById('lastModifiedBar').style.display = "block";
             document.getElementById('lastModText').innerText = `${timestamp} tarihinde ${assessor || 'Bilinmeyen'} tarafından kaydedildi.`;
-            alert("✅ Veriler buluta başarıyla kaydedildi!");
-        })
-        .catch(err => {
+            alert("✅ Kaydedildi!");
+        }).catch(err => {
             document.getElementById('loadingOverlay').style.display = "none";
             alert("❌ Kayıt başarısız.");
         });
     }
 
-    function loadFromCloud() {
-        //if(GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwXBeArILDETklbygYXgA4pIHGk8EkfPSzKQZz3Ywk_obrh0tulisSC6gBWIbqMKIZM/exec") return alert("Lütfen URL ayarını yapın.");
-        const uid = document.getElementById('displayUID').value.trim();
-        if(!uid || uid === "SBST-") return alert("Lütfen geri çağırmak istediğiniz Protokol ID'sini yazın.");
+    // YENİ: Listeleme ve Seçme İşlemleri
+    function closeListModal() {
+        document.getElementById('listModal').style.display = "none";
+    }
 
+    function fetchRecordsList() {
+        if(GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") return alert("Lütfen URL ayarını yapın.");
+        
+        document.getElementById('loadingText').innerText = "Kayıtlar aranıyor...";
         document.getElementById('loadingOverlay').style.display = "flex";
-        const payload = { action: "load", uid: uid };
 
         fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ action: "list" })
+        })
+        .then(response => response.json())
+        .then(res => {
+            document.getElementById('loadingOverlay').style.display = "none";
+            if(res.status === "success") {
+                renderRecordList(res.data);
+            } else {
+                alert("❌ Liste alınamadı.");
+            }
+        }).catch(err => {
+            document.getElementById('loadingOverlay').style.display = "none";
+            alert("❌ Bağlantı hatası.");
+        });
+    }
+
+    function renderRecordList(records) {
+        const container = document.getElementById('recordListContainer');
+        container.innerHTML = "";
+
+        if(records.length === 0) {
+            container.innerHTML = "<div style='padding:20px; text-align:center;'>Hiç kayıt bulunamadı.</div>";
+        } else {
+            records.forEach(rec => {
+                const div = document.createElement('div');
+                div.className = "record-item";
+                div.innerHTML = `
+                    <div>
+                        <div class="r-uid">${rec.uid} <span style="color:var(--text-main); font-size:12px;">(Sıra: ${rec.siraNo})</span></div>
+                        <div class="r-info">Son İşlem: ${rec.lastModified} - ${rec.modifiedBy}</div>
+                    </div>
+                    <div style="font-size:20px;">➡️</div>
+                `;
+                div.onclick = () => loadSingleRecord(rec.uid);
+                container.appendChild(div);
+            });
+        }
+        document.getElementById('listModal').style.display = "flex";
+    }
+
+    function loadSingleRecord(uid) {
+        closeListModal();
+        document.getElementById('loadingText').innerText = "Test verileri yükleniyor...";
+        document.getElementById('loadingOverlay').style.display = "flex";
+
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: "load", uid: uid })
         })
         .then(response => response.json())
         .then(res => {
             document.getElementById('loadingOverlay').style.display = "none";
             if(res.status === "found") {
+                isNewRecordSaved = true; // Yüklenen veri eski veri olduğu için tekrar sıra atamasına gerek yok
+                
+                document.getElementById('displayUID').value = uid;
                 document.getElementById('siraNo').value = res.siraNo;
                 document.getElementById('pAge').value = res.yas;
                 document.getElementById('pEdu').value = res.egitim;
@@ -497,12 +604,10 @@
                 intrusions = cloudData.errors;
 
                 updateUIFromData();
-                alert(`✅ ${uid} ID'li test başarıyla yüklendi.`);
-            } else { alert("❌ Bu ID'ye ait bir kayıt bulunamadı."); }
-        })
-        .catch(err => {
+            } else { alert("❌ Kayıt bulunamadı."); }
+        }).catch(err => {
             document.getElementById('loadingOverlay').style.display = "none";
-            alert("❌ Buluttan çekerken bir hata oluştu.");
+            alert("❌ Veri çekilirken hata oluştu.");
         });
     }
 </script>
