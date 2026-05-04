@@ -59,12 +59,16 @@
         .btn-back { background: transparent; color: var(--text-muted); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 15px; display: inline-flex; gap: 5px; }
         
         .word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .word-btn { position: relative; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); padding: 15px 5px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; min-height: 70px; transition: 0.15s; }
+        .word-btn { position: relative; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); padding: 18px 5px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; min-height: 70px; transition: 0.15s; }
         .word-btn.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
         .word-btn.tanima-selected { background: var(--highlight-purple); color: var(--purple-text); border-color: var(--purple-text); box-shadow: inset 0 0 0 2px var(--purple-text); }
         
         .word-btn.tt-correct { background-color: var(--success) !important; color: white !important; border-color: var(--success) !important; box-shadow: 0 4px 10px rgba(45, 164, 78, 0.3); }
         .word-btn.tt-wrong { background-color: var(--danger) !important; color: white !important; border-color: var(--danger) !important; box-shadow: 0 4px 10px rgba(207, 34, 46, 0.3); }
+
+        /* Yeni: Saydam Orijinal Sıra Numarası (Filigran) */
+        .orig-order { position: absolute; top: 4px; left: 6px; font-size: 11px; opacity: 0.35; font-weight: 700; color: inherit; }
+        .word-btn.selected .orig-order { color: #fff; opacity: 0.6; }
 
         .order-badge { position: absolute; top: -8px; right: -8px; background: var(--bg-panel); width: 24px; height: 24px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 12px; border: 2px solid var(--border); font-weight: bold; color: var(--primary); }
         .word-btn.selected .order-badge { display: flex; }
@@ -119,12 +123,11 @@
         <h2 style="font-size: 20px;">Klinik Kayıt Paneli (Yerel Mod)</h2>
         <div class="cloud-actions">
             <button class="btn-cloud new-test" onclick="handleNewTest()">➕ Yeni</button>
-            <button class="btn-cloud save" onclick="saveToLocal(false)">💾 Cihaza Kaydet</button>
+            <button class="btn-cloud save" onclick="saveToLocal(false)">💾 Kaydet</button>
             <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌗 Tema</button>
         </div>
     </div>
 
-    <!-- İnputlar değiştiğinde otomatik kaydetmesi için onchange eklendi -->
     <div class="header-grid">
         <div class="input-group"><label>Sıra No:</label><input type="text" id="siraNo" class="sira-input" readonly></div>
         <div class="input-group"><label>Protokol ID:</label><input type="text" id="displayUID" class="uid-input" readonly></div>
@@ -141,7 +144,6 @@
                 <tr>
                     <th rowspan="2">Kelimeler</th>
                     <th colspan="10">Öğrenme Denemeleri</th>
-                    <!-- Hatırlatma Sütunu -->
                     <th rowspan="2" style="background:#e0f2fe; width:50px;">
                         <span class="print-text">Hatırlatma</span><button class="btn-start no-print" style="background:transparent; border-color:#0284c7; color:#0284c7;" onclick="startTrial('H')">Hatırlatma</button>
                     </th>
@@ -151,7 +153,6 @@
                     <th rowspan="2" style="background:var(--highlight-purple); width:50px;">
                         <span class="print-text">Tanıma(3lü)</span><button class="btn-start no-print" style="color:var(--purple-text);" onclick="startTrial('TANIMA')">Tanıma</button>
                     </th>
-                    <!-- Toplu Serbest Tanıma Sütunu -->
                     <th rowspan="2" style="background:#fce7f3; width:60px;">
                         <span class="print-text">Serbest T.</span><button class="btn-start no-print" style="background:transparent; border-color:#db2777; color:#db2777;" onclick="startTrial('TOPLU_TANIMA')">45 Kelime</button>
                     </th>
@@ -219,7 +220,6 @@
         const tbody = document.getElementById('mainTableBody'); 
         const intRow = document.querySelector('.intrusion-row');
         
-        // Tablo Sütunlarını Oluştur
         for(let i=1; i<=10; i++) {
             headers.innerHTML += `<th><span class="print-text">${i}</span><button class="btn-start no-print" onclick="startTrial(${i})">D${i}</button></th>`;
             intRow.innerHTML += `<td id="int-${i}"></td>`;
@@ -236,7 +236,6 @@
             tbody.innerHTML += r;
         });
 
-        // Sayfa açıldığında önbellekte taslak varsa yükle, yoksa yeni test aç.
         loadFromLocal();
     };
 
@@ -247,12 +246,7 @@
         return `SBST-${p1}-${p2}`;
     }
 
-    // =========================================
-    // LOCAL STORAGE (CİHAZ ÖNBELLEĞİ) İŞLEMLERİ
-    // =========================================
-    
     function saveToLocal(isSilent = false) {
-        // Otomatik Sıra Ataması
         let sNo = document.getElementById('siraNo').value;
         if(sNo === "" || sNo.includes("Kayıtta")) {
             let seq = parseInt(localStorage.getItem('sbstSequence')) || 0;
@@ -273,13 +267,10 @@
             intrusions: intrusions
         };
 
-        // Veriyi JSON yapıp tarayıcıya göm
         localStorage.setItem('sbst_draft', JSON.stringify(draft));
         localStorage.setItem('sbstAssessor', document.getElementById('assessorName').value);
 
-        if(!isSilent) {
-            alert("✅ Yarım kalan test başarıyla cihaza kaydedildi!");
-        }
+        if(!isSilent) alert("✅ Yarım kalan test başarıyla cihaza kaydedildi!");
     }
 
     function loadFromLocal() {
@@ -298,35 +289,29 @@
                 testData = draft.testData || { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{} };
                 intrusions = draft.intrusions || { 1:"", 2:"", 3:"", 4:"", 5:"", 6:"", 7:"", 8:"", 9:"", 10:"", "H":"", "USB":"", "TOPLU_TANIMA":"" };
                 
-                // Eskiden kalma veri tiplerini koruma
                 if(!testData['H']) testData['H'] = {};
                 if(!testData['TOPLU_TANIMA']) testData['TOPLU_TANIMA'] = {};
 
                 updateUIFromData();
             } catch(e) {
-                // Veri bozulmuşsa temizleyip sıfırla
                 console.error("Local draft bozuk, temizleniyor.");
                 localStorage.removeItem('sbst_draft');
                 createNewTest(true);
             }
         } else {
-            // Hiç taslak yoksa yeni boş test aç
             createNewTest(true);
         }
     }
 
     function handleNewTest() {
         if(localStorage.getItem('sbst_draft')) {
-            if(!confirm("Mevcut yarım kalan bir test var. Silip yepyeni bir test açmak istediğinize emin misiniz?")) {
-                return;
-            }
+            if(!confirm("Mevcut yarım kalan bir test var. Silip yepyeni bir test açmak istediğinize emin misiniz?")) return;
         }
         createNewTest();
     }
 
     function createNewTest(force = false) {
-        localStorage.removeItem('sbst_draft'); // Eski taslağı sil
-
+        localStorage.removeItem('sbst_draft'); 
         document.getElementById('pAge').value = ""; document.getElementById('pEdu').value = ""; document.getElementById('digitSpan').value = "";
         document.getElementById('displayUID').value = generateAlphaNumericID(); 
         document.getElementById('pDate').valueAsDate = new Date();
@@ -338,10 +323,6 @@
         updateUIFromData();
     }
 
-    // =========================================
-    // TEST MANTIĞI VE ARAYÜZ (Aynı Kaldı)
-    // =========================================
-
     function startTrial(key) {
         activeKey = key; clickOrder = 1; history = [];
         const grid = document.getElementById('wordGrid'); const tGrid = document.getElementById('tanimaGrid');
@@ -351,14 +332,22 @@
 
         if(key === 'TANIMA') {
             document.getElementById('trialTitle').innerText = "Tanıma (Üçlü Gruplar)";
-            document.getElementById('trialDesc').innerText = "Hastaya her gruptaki 3 kelimeyi okuyup hangisini söylediğini seçiniz.";
+            document.getElementById('trialDesc').innerText = "Sadece USB'de hatırlanamayan kelimelerin üçlü grupları. Hastaya okuyup hangisini söylediğini seçiniz.";
             document.getElementById('orderTrackerDiv').style.display = 'none'; document.getElementById('intrusionBox').style.display = 'none';
             grid.style.display = 'none'; tGrid.style.display = 'block';
+            let added = false;
             triplets.forEach((g, i) => {
-                let h = `<div class="triplet-row"><div style="width:24px; font-weight:600; color:var(--text-muted);">${i+1}.</div><div class="triplet-btns">`;
-                g.forEach(w => h += `<button class="word-btn" style="flex:1" id="t-${i}-${w}" onclick="handleTanimaClick(${i},'${w}')">${w}</button>`);
-                tGrid.innerHTML += h + `</div></div>`;
+                if(!testData['USB'][i]) { // YALNIZCA USB'DE BİLİNMEYENLERİ GÖSTER
+                    let h = `<div class="triplet-row"><div style="width:24px; font-weight:600; color:var(--text-muted);">${i+1}.</div><div class="triplet-btns">`;
+                    g.forEach(w => h += `<button class="word-btn" style="flex:1" id="t-${i}-${w}" onclick="handleTanimaClick(${i},'${w}')">${w}</button>`);
+                    tGrid.innerHTML += h + `</div></div>`;
+                    added = true;
+                }
             });
+            if(!added) { 
+                tGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; font-weight:bold; color:var(--success);">USB aşamasında tüm kelimeler kendiliğinden hatırlandığı için tanıma aşamasına gerek yoktur.</div>`; 
+                document.getElementById('undoBtn').style.display = 'none'; 
+            }
         } 
         else if (key === 'TOPLU_TANIMA') {
             document.getElementById('trialTitle').innerText = "Serbest Tanıma (45 Kelime)";
@@ -383,9 +372,12 @@
             let added = false;
             words.forEach((w, i) => {
                 if(!testData[10][i]) { 
-                    grid.innerHTML += `<button class="word-btn" id="btn-${i}" onclick="handleWordClick(${i})">${w.k}
+                    grid.innerHTML += `<button class="word-btn" id="btn-${i}" onclick="handleWordClick(${i})">
+                        <span class="orig-order">${i + 1}</span>
+                        ${w.k}
                         <div style="font-size:11px; color:var(--warning); font-weight:normal; margin-top:6px;">İpucu: ${w.hint}</div>
-                        <div class="order-badge" id="badge-${i}"></div></button>`;
+                        <div class="order-badge" id="badge-${i}"></div>
+                    </button>`;
                     added = true;
                 }
             });
@@ -396,7 +388,13 @@
             document.getElementById('trialDesc').innerText = "Söylenen kelimelere sırayla dokunun.";
             document.getElementById('orderTrackerDiv').style.display = 'block'; document.getElementById('currentOrderDisplay').innerText = "1";
             grid.style.display = 'grid'; tGrid.style.display = 'none';
-            words.forEach((w, i) => grid.innerHTML += `<button class="word-btn" id="btn-${i}" onclick="handleWordClick(${i})">${w.k}<div class="order-badge" id="badge-${i}"></div></button>`);
+            words.forEach((w, i) => {
+                grid.innerHTML += `<button class="word-btn" id="btn-${i}" onclick="handleWordClick(${i})">
+                    <span class="orig-order">${i + 1}</span>
+                    ${w.k}
+                    <div class="order-badge" id="badge-${i}"></div>
+                </button>`;
+            });
         }
         document.getElementById('dashboardView').style.display = 'none'; document.getElementById('activeTrialView').style.display = 'block';
     }
@@ -439,20 +437,31 @@
     function saveAndReturn() { 
         if(activeKey !== 'TANIMA' && activeKey !== 'TOPLU_TANIMA') intrusions[activeKey] = document.getElementById('intrusionInput').value;
         
-        // D10 KAYDEDİLDİĞİNDE EKSİK VARSA OTOMATİK HATIRLATMA EKRANINA GEÇ
+        // D10 -> EKSİK VARSA OTOMATİK HATIRLATMAYA GEÇ
         if(activeKey === 10) {
             let missedCount = 0;
             for(let i=0; i<15; i++) { if(!testData[10][i]) missedCount++; }
             if(missedCount > 0) {
                 updateUIFromData(); 
-                saveToLocal(true); // Sessizce taslağı kaydet
+                saveToLocal(true); 
                 startTrial('H');   
+                return;
+            }
+        }
+        // USB -> EKSİK VARSA OTOMATİK TANIMAYA GEÇ
+        else if (activeKey === 'USB') {
+            let missedCount = 0;
+            for(let i=0; i<15; i++) { if(!testData['USB'][i]) missedCount++; }
+            if(missedCount > 0) {
+                updateUIFromData(); 
+                saveToLocal(true); 
+                startTrial('TANIMA');   
                 return;
             }
         }
         
         updateUIFromData(); 
-        saveToLocal(true); // Her tabloya dönüşte sessizce önbelleğe kaydet
+        saveToLocal(true); 
         cancelTrial(); 
     }
     
@@ -469,7 +478,17 @@
 
         words.forEach((w, i) => {
             let t = targetWordsUpper[i]; let gI = triplets.findIndex(g => g.includes(t)); let sel = testData['TANIMA'][gI];
-            let cell = document.getElementById(`c-TANIMA-${i}`); cell.innerText = sel===t ? "+T" : (sel ? "-Y" : ""); cell.style.color = sel===t ? "var(--success)" : "var(--danger)";
+            let cell = document.getElementById(`c-TANIMA-${i}`); 
+            
+            // Eğer USB'de kendiliğinden hatırlanmışsa, SBST kuralı gereği Tanınmış (+T) sayılır.
+            let isKnownInUSB = testData['USB'][i] !== undefined;
+            if(isKnownInUSB) {
+                cell.innerText = "+T";
+                cell.style.color = "var(--success)";
+            } else {
+                cell.innerText = sel===t ? "+T" : (sel ? "-Y" : ""); 
+                cell.style.color = sel===t ? "var(--success)" : "var(--danger)";
+            }
         });
 
         let topluFalsePositives = [];
@@ -494,7 +513,18 @@
         document.getElementById('resToplam').innerText = tot; document.getElementById('resEnYuksek').innerText = mx;
         document.getElementById('resUSB').innerText = Object.keys(testData['USB']).length;
         
-        let ok = 0, err = 0; Object.keys(testData['TANIMA']).forEach(k => { if(targetWordsUpper.includes(testData['TANIMA'][k])) ok++; else err++; });
+        let ok = 0, err = 0; 
+        words.forEach((w, i) => {
+            let isKnownInUSB = testData['USB'][i] !== undefined;
+            if(isKnownInUSB) {
+                ok++; // USB'de bilinen kelime otomatik olarak Tanımada doğru kabul edilir
+            } else {
+                let t = targetWordsUpper[i]; let gI = triplets.findIndex(g => g.includes(t));
+                let sel = testData['TANIMA'][gI];
+                if(sel === t) ok++;
+                else if (sel) err++;
+            }
+        });
         document.getElementById('resTanima').innerText = ok; document.getElementById('resYanlisTanima').innerText = err;
 
         let okToplu = 0, errToplu = 0;
