@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Öktem-SBST Dijital Asistan (Tam Sürüm)</title>
+    <title>Öktem-SBST Dijital Asistan</title>
     <style>
         :root { --primary: #1e40af; --secondary: #3b82f6; --success: #16a34a; --warning: #d97706; --danger: #dc2626; --bg: #f8fafc; --text: #0f172a; --border: #cbd5e1; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; font-size: 14px; }
@@ -11,10 +11,10 @@
         
         h2, h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
         
-        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .input-group { display: flex; flex-direction: column; }
         .input-group label { font-weight: bold; margin-bottom: 5px; color: #475569; font-size: 12px; text-transform: uppercase; }
-        .input-group input { padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
+        .input-group input, .input-group select { padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background-color: white; }
         .alert { background: #fef2f2; color: var(--danger); padding: 10px; border-radius: 6px; font-weight: bold; display: none; margin-top: 10px; border-left: 4px solid var(--danger); }
 
         #dashboardView { display: block; }
@@ -36,7 +36,7 @@
             transition: all 0.1s; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70px;
         }
         .word-btn.selected { background: #dbeafe; border-color: var(--secondary); color: var(--primary); }
-        .word-btn.tanima-selected { background: #f3e8ff; border-color: #9333ea; color: #6b21a8; } /* Tanıma için mor seçim */
+        .word-btn.tanima-selected { background: #f3e8ff; border-color: #9333ea; color: #6b21a8; }
         
         .hint-text { font-size: 11px; color: var(--warning); font-weight: normal; margin-top: 5px; display: none; }
         
@@ -72,19 +72,32 @@
     <h2>Öktem Sözel Bellek Süreçleri Testi (A Listesi)</h2>
     
     <div class="header-grid">
-        <div class="input-group"><label>Hasta Adı Soyadı</label><input type="text" id="pName"></div>
-        <div class="input-group"><label>Yaş / Eğitim (Yıl)</label>
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="pAge" placeholder="Yaş" style="width:50%;">
-                <input type="number" id="pEdu" placeholder="Eğitim" style="width:50%;">
-            </div>
-        </div>
-        <div class="input-group"><label>Tarih</label><input type="date" id="pDate"></div>
         <div class="input-group">
-            <label>Sayı Menzili (Ön Test)</label>
-            <input type="number" id="digitSpan" placeholder="Kısa Süreli Bellek Puanı" oninput="checkMenzil()">
+            <label>Hasta Adı Soyadı</label>
+            <input type="text" id="pName" placeholder="Ad Soyad">
+        </div>
+        <div class="input-group">
+            <label>Yaş</label>
+            <input type="number" id="pAge" placeholder="Örn: 65">
+        </div>
+        <div class="input-group">
+            <label>Eğitim</label>
+            <select id="pEdu">
+                <option value="">Seçiniz...</option>
+                <option value="0-7">0-7 Yıl (İlköğretim ve Altı)</option>
+                <option value="8-19">8-19 Yıl (Lise ve Üzeri)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Tarih</label>
+            <input type="date" id="pDate">
+        </div>
+        <div class="input-group">
+            <label>Sayı Menzili</label>
+            <input type="number" id="digitSpan" placeholder="Ön Test Puanı" oninput="checkMenzil()">
         </div>
     </div>
+    
     <div id="menzilAlert" class="alert">DİKKAT: Sayı menzili 3 veya altındadır. Listeyi 10 veya 5 kelimeyle uygulayınız!</div>
 
     <h3 style="margin-top: 30px;">Kayıt ve Puanlama Tablosu</h3>
@@ -159,7 +172,7 @@
         {k: "Nehir", hint: "Akarsu"}
     ];
     
-    // 45 Kelimelik Tanıma Listesi (SBST-A Belgesindeki sırasıyla)
+    // 45 Kelimelik Tanıma Listesi
     const tanimaList = [
         "DUVAR", "TARLA", "DAVUL", "GİTAR", "ÇİFTÇİ", "ÇİFTLİK", "KAPI", "PENCERE", 
         "PERDE", "ZURNA", "BOĞAZ", "BURUN", "KULAK", "HİNDİ", "ZİL", "ÇAN", "TAVUK", 
@@ -168,7 +181,6 @@
         "DERE", "ÇİÇEK", "BAHÇE", "ŞARAP", "ŞAPKA", "KASKET", "GÜNEŞ", "AY", "AYVA"
     ];
     
-    // 15 hedef kelimenin büyük harfli halleri (Puanlama kontrolü için)
     const targetWordsUpper = words.map(w => w.k.toUpperCase());
 
     let testData = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "USB":{}, "TANIMA":{} };
@@ -223,7 +235,6 @@
             document.getElementById('intrusionBox').style.display = 'none';
             document.getElementById('undoBtn').style.display = 'none';
 
-            // Tanıma listesindeki 45 kelimeyi ekrana bas
             tanimaList.forEach((word) => {
                 grid.innerHTML += `
                     <button class="word-btn" id="btn-tanima-${word}" onclick="handleTanimaClick('${word}')">
@@ -257,7 +268,6 @@
         document.getElementById('activeTrialView').style.display = 'block';
     }
 
-    // Öğrenme ve USB Aşaması Tıklaması
     function handleWordClick(idx) {
         if(testData[activeKey][idx]) return; 
         testData[activeKey][idx] = clickOrder;
@@ -270,15 +280,12 @@
         document.getElementById('currentOrderDisplay').innerText = clickOrder;
     }
 
-    // Tanıma Aşaması Tıklaması ("Vardı" diyenler)
     function handleTanimaClick(word) {
         const btn = document.getElementById(`btn-tanima-${word}`);
         if(testData['TANIMA'][word]) {
-            // Tıklamayı geri al
             delete testData['TANIMA'][word];
             btn.classList.remove('tanima-selected');
         } else {
-            // Seç
             testData['TANIMA'][word] = true;
             btn.classList.add('tanima-selected');
         }
@@ -303,7 +310,6 @@
                 document.getElementById(`c-${activeKey}-${idx}`).innerText = testData[activeKey][idx] || "";
             });
         } else {
-            // Tanıma tablosunu güncelle (Sadece hedef kelimelerin yanına + veya - koy)
             words.forEach((w, idx) => {
                 let isRecognized = testData['TANIMA'][w.k.toUpperCase()];
                 document.getElementById(`c-TANIMA-${idx}`).innerText = isRecognized ? "+T" : "-";
@@ -335,15 +341,14 @@
 
         document.getElementById('resUSB').innerText = Object.keys(testData['USB']).length;
 
-        // Tanıma Puanları Hesaplama
         let dogruTanima = 0;
         let yanlisTanima = 0;
         
         Object.keys(testData['TANIMA']).forEach(selectedWord => {
             if(targetWordsUpper.includes(selectedWord)) {
-                dogruTanima++; // Hedef kelimeyi bildi
+                dogruTanima++;
             } else {
-                yanlisTanima++; // Hedef olmayan kelimeye (çeldiriciye) "vardı" dedi
+                yanlisTanima++;
             }
         });
 
