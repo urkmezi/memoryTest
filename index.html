@@ -41,10 +41,6 @@
         .input-group input, .input-group select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--bg-body); color: var(--text-main); outline: none; transition: 0.2s; }
         
         input[readonly] { background-color: var(--secondary); cursor: not-allowed; border-color: transparent; }
-        .uid-input { font-family: monospace; font-weight: 600; color: var(--primary); }
-        .sira-input { font-size: 16px; font-weight: bold; color: var(--success); text-align: center; }
-
-        .alert { background: rgba(207, 34, 46, 0.1); color: var(--danger); padding: 12px; border-radius: 6px; font-weight: 600; display: none; margin-top: 10px; border: 1px solid rgba(207, 34, 46, 0.4); }
 
         .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; border: 1px solid var(--border); border-radius: 6px; }
         table { width: 100%; border-collapse: collapse; text-align: center; border-style: hidden; }
@@ -66,7 +62,6 @@
         .word-btn.tt-correct { background-color: var(--success) !important; color: white !important; border-color: var(--success) !important; box-shadow: 0 4px 10px rgba(45, 164, 78, 0.3); }
         .word-btn.tt-wrong { background-color: var(--danger) !important; color: white !important; border-color: var(--danger) !important; box-shadow: 0 4px 10px rgba(207, 34, 46, 0.3); }
 
-        /* Orijinal Sıra Numarası (Filigran) */
         .orig-order { position: absolute; top: 4px; left: 6px; font-size: 11px; opacity: 0.35; font-weight: 700; color: inherit; }
         .word-btn.selected .orig-order { color: #fff; opacity: 0.6; }
 
@@ -115,7 +110,10 @@
 <div class="container" id="dashboardView">
     <div class="print-only">
         <h1 style="margin:0;">Öktem-SBST Test Raporu</h1>
-        <p><b>Sıra No:</b> <span id="printSira"></span> &nbsp; | &nbsp; <b>Protokol ID:</b> <span id="printUID"></span></p>
+        <p style="margin-top:10px; font-size:14px;">
+            <b>Hasta Adı:</b> <span id="printPatientName"></span> &nbsp; | &nbsp; 
+            <b>Tarih:</b> <span id="printDate"></span>
+        </p>
         <p style="margin-top:5px; font-size: 14px;">Uygulayan: <span id="printAssessor"></span></p>
     </div>
 
@@ -129,12 +127,19 @@
     </div>
 
     <div class="header-grid">
-        <div class="input-group"><label>Sıra No:</label><input type="text" id="siraNo" class="sira-input" readonly></div>
-        <div class="input-group"><label>Protokol ID:</label><input type="text" id="displayUID" class="uid-input" readonly></div>
-        <div class="input-group no-print"><label>Uygulayan:</label><input type="text" id="assessorName" onchange="saveToLocal(true)"></div>
+        <div class="input-group no-print"><label>Hasta Adı / Rumuz:</label><input type="text" id="pName" placeholder="Ad Soyad" onchange="saveToLocal(true)"></div>
         <div class="input-group no-print"><label>Yaş:</label><input type="number" id="pAge" onchange="saveToLocal(true)"></div>
+        <div class="input-group no-print">
+            <label>Cinsiyet:</label>
+            <select id="pGender" onchange="saveToLocal(true)">
+                <option value="">Seçiniz...</option>
+                <option value="Kadın">Kadın</option>
+                <option value="Erkek">Erkek</option>
+            </select>
+        </div>
         <div class="input-group"><label>Eğitim:</label><select id="pEdu" onchange="saveToLocal(true)"><option value="0-7">0-7 Yıl</option><option value="8-19">8-19 Yıl</option></select></div>
         <div class="input-group"><label>Tarih:</label><input type="date" id="pDate" onchange="saveToLocal(true)"></div>
+        <div class="input-group no-print"><label>Uygulayan:</label><input type="text" id="assessorName" onchange="saveToLocal(true)"></div>
         <div class="input-group"><label>Sayı Menzili:</label><input type="number" id="digitSpan" onchange="saveToLocal(true)"></div>
     </div>
 
@@ -206,7 +211,13 @@
 <script>
     const words = [{k:"Davul", hint:"Çalgı / Köy düğünü"},{k:"Perde", hint:"Cama takılır"},{k:"Zil", hint:"Basılınca ses çıkarır"},{k:"Kahve", hint:"Sıcak içecek"},{k:"Okul", hint:"Çocuklar gönderilir"},{k:"Anne", hint:"Yakın sevdiğimiz"},{k:"Bahçe", hint:"Ev önünde, yeşillik"},{k:"Şapka", hint:"Güneşten korur"},{k:"Ay", hint:"Gökyüzü / Gece"},{k:"Çiftçi", hint:"Toprakla uğraşan"},{k:"Burun", hint:"Yüzümüzde organ"},{k:"Hindi", hint:"İki bacaklı hayvan"},{k:"Renk", hint:"Gökkuşağı"},{k:"Ev", hint:"İçinde yaşadığımız yer"},{k:"Nehir", hint:"Akarsu"}];
     const triplets = [["DUVAR","DAVUL","ZURNA"],["TARLA","ÇİFTÇİ","ÇİFTLİK"],["KAPI","PENCERE","PERDE"],["BOĞAZ","BURUN","KULAK"],["ÇAN","ZİL","HENDEK"],["TAVUK","HİNDİ","GİTAR"],["ÇAY","KAHVE","KAHVALTI"],["RESİM","RENK","REKLAM"],["ODA","OKUL","ÖĞRETMEN"],["EL","EV","ODUN"],["ABLA","ANNE","BABA"],["DENİZ","NEHİR","DERE"],["ÇİÇEK","BAHÇE","AĞAÇ"],["ŞARAP","ŞAPKA","KASKET"],["GÜNEŞ","AY","AYVA"]];
-    const targetWordsUpper = words.map(w => w.k.toUpperCase());
+    
+    const targetWordToIdx = {
+        "DAVUL": 0, "PERDE": 1, "ZİL": 2, "KAHVE": 3, "OKUL": 4, 
+        "ANNE": 5, "BAHÇE": 6, "ŞAPKA": 7, "AY": 8, "ÇİFTÇİ": 9, 
+        "BURUN": 10, "HİNDİ": 11, "RENK": 12, "EV": 13, "NEHİR": 14
+    };
+    const targetWordsKeys = Object.keys(targetWordToIdx);
     const all45Words = triplets.flat().sort((a,b)=>a.localeCompare(b,'tr')); 
     
     let testData = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{} };
@@ -229,48 +240,43 @@
         words.forEach((w, idx) => {
             let r = `<tr><td class="word-cell">${w.k}</td>`;
             for(let i=1; i<=10; i++) r += `<td id="c-${i}-${idx}"></td>`;
-            r += `<td id="c-H-${idx}" style="background:#e0f2fe; font-weight:bold; color:#0284c7;"></td>`;
+            r += `<td id="c-H-${idx}" style="background:#e0f2fe; font-weight:bold; color:#0284c7; text-align:center;"></td>`;
             r += `<td id="c-USB-${idx}" style="background:var(--highlight-yellow);"></td>`;
-            r += `<td id="c-TANIMA-${idx}" style="background:var(--highlight-purple); font-weight:bold;"></td>`;
-            r += `<td id="c-TOPLU_TANIMA-${idx}" style="background:#fce7f3; font-weight:bold;"></td></tr>`;
+            r += `<td id="c-TANIMA-${idx}" style="background:var(--highlight-purple); font-weight:bold; text-align:center;"></td>`;
+            r += `<td id="c-TOPLU_TANIMA-${idx}" style="background:#fce7f3; font-weight:bold; text-align:center;"></td></tr>`;
             tbody.innerHTML += r;
         });
 
         loadFromLocal();
     };
 
-    function generateAlphaNumericID() {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let p1 = '', p2 = '';
-        for(let i=0; i<4; i++) p1 += chars.charAt(Math.floor(Math.random()*chars.length));
-        for(let i=0; i<4; i++) p2 += chars.charAt(Math.floor(Math.random()*chars.length));
-        return `SBST-${p1}-${p2}`;
+    // Bugünün tarihini formatlı (YYYY-MM-DD) almak için yardımcı fonksiyon
+    function getTodayString() {
+        const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+        return (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
     }
 
     function saveToLocal(isSilent = false) {
-        let sNo = document.getElementById('siraNo').value;
-        if(sNo === "" || sNo.includes("Kayıtta")) {
-            let seq = parseInt(localStorage.getItem('sbstSequence')) || 0;
-            seq = seq + 1;
-            localStorage.setItem('sbstSequence', seq);
-            document.getElementById('siraNo').value = seq;
+        try {
+            const draft = {
+                pName: document.getElementById('pName').value, 
+                assessorName: document.getElementById('assessorName').value,
+                pAge: document.getElementById('pAge').value,
+                pGender: document.getElementById('pGender').value,
+                pEdu: document.getElementById('pEdu').value,
+                pDate: document.getElementById('pDate').value,
+                digitSpan: document.getElementById('digitSpan').value,
+                testData: testData,
+                intrusions: intrusions
+            };
+
+            localStorage.setItem('sbst_draft', JSON.stringify(draft));
+            localStorage.setItem('sbstAssessor', document.getElementById('assessorName').value);
+
+            if(!isSilent) alert("✅ Yarım kalan test başarıyla cihaza kaydedildi!");
+        } catch(err) {
+            console.error(err);
         }
-
-        const draft = {
-            uid: document.getElementById('displayUID').value,
-            siraNo: document.getElementById('siraNo').value,
-            assessorName: document.getElementById('assessorName').value,
-            pAge: document.getElementById('pAge').value,
-            pEdu: document.getElementById('pEdu').value,
-            pDate: document.getElementById('pDate').value,
-            digitSpan: document.getElementById('digitSpan').value,
-            testData: testData,
-            intrusions: intrusions
-        };
-
-        localStorage.setItem('sbst_draft', JSON.stringify(draft));
-        localStorage.setItem('sbstAssessor', document.getElementById('assessorName').value);
-
-        if(!isSilent) alert("✅ Yarım kalan test başarıyla cihaza kaydedildi!");
     }
 
     function loadFromLocal() {
@@ -278,12 +284,12 @@
         if (draftStr) {
             try {
                 const draft = JSON.parse(draftStr);
-                document.getElementById('displayUID').value = draft.uid || generateAlphaNumericID();
-                document.getElementById('siraNo').value = draft.siraNo || "";
+                document.getElementById('pName').value = draft.pName || ""; 
                 document.getElementById('assessorName').value = draft.assessorName || localStorage.getItem('sbstAssessor') || "";
                 document.getElementById('pAge').value = draft.pAge || "";
+                document.getElementById('pGender').value = draft.pGender || "";
                 document.getElementById('pEdu').value = draft.pEdu || "";
-                document.getElementById('pDate').value = draft.pDate || new Date().toISOString().split('T')[0];
+                document.getElementById('pDate').value = draft.pDate || getTodayString();
                 document.getElementById('digitSpan').value = draft.digitSpan || "";
                 
                 testData = draft.testData || { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{} };
@@ -296,10 +302,10 @@
             } catch(e) {
                 console.error("Local draft bozuk, temizleniyor.");
                 localStorage.removeItem('sbst_draft');
-                createNewTest(true);
+                createNewTest();
             }
         } else {
-            createNewTest(true);
+            createNewTest();
         }
     }
 
@@ -310,12 +316,14 @@
         createNewTest();
     }
 
-    function createNewTest(force = false) {
+    function createNewTest() {
         localStorage.removeItem('sbst_draft'); 
-        document.getElementById('pAge').value = ""; document.getElementById('pEdu').value = ""; document.getElementById('digitSpan').value = "";
-        document.getElementById('displayUID').value = generateAlphaNumericID(); 
-        document.getElementById('pDate').valueAsDate = new Date();
-        document.getElementById('siraNo').value = `(Kayıtta: ${(parseInt(localStorage.getItem('sbstSequence'))||0) + 1})`;
+        document.getElementById('pName').value = ""; 
+        document.getElementById('pAge').value = ""; 
+        document.getElementById('pGender').value = ""; 
+        document.getElementById('pEdu').value = ""; 
+        document.getElementById('digitSpan').value = "";
+        document.getElementById('pDate').value = getTodayString();
         document.getElementById('assessorName').value = localStorage.getItem('sbstAssessor') || "";
 
         testData = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{} };
@@ -332,18 +340,16 @@
 
         if(key === 'TANIMA') {
             document.getElementById('trialTitle').innerText = "Tanıma (Üçlü Gruplar)";
-            document.getElementById('trialDesc').innerText = "Önceki aşamada hatırlanamayan kelimelerin üçlü grupları. Hastaya okuyup hangisini söylediğini seçiniz.";
+            document.getElementById('trialDesc').innerText = "SADECE USB'de hatırlanamayan kelimelerin üçlü grupları. Hastaya okuyup hangisini söylediğini seçiniz.";
             document.getElementById('orderTrackerDiv').style.display = 'none'; document.getElementById('intrusionBox').style.display = 'none';
             grid.style.display = 'none'; tGrid.style.display = 'block';
             let added = false;
             
-            let sourceStage = Object.keys(testData['USB']).length > 0 ? 'USB' : 10;
-            
             triplets.forEach((g, gI) => {
-                let targetWord = g.find(w => targetWordsUpper.includes(w));
-                let wordIndex = targetWordsUpper.indexOf(targetWord);
+                let targetWord = g.find(w => targetWordsKeys.includes(w));
+                let wordIndex = targetWordToIdx[targetWord];
                 
-                if(!testData[sourceStage][wordIndex]) { 
+                if(!testData['USB'][wordIndex]) { 
                     let h = `<div class="triplet-row"><div style="width:24px; font-weight:600; color:var(--text-muted);">${gI+1}.</div><div class="triplet-btns">`;
                     g.forEach(w => h += `<button class="word-btn" style="flex:1" id="t-${gI}-${w}" onclick="handleTanimaClick(${gI},'${w}')">${w}</button>`);
                     tGrid.innerHTML += h + `</div></div>`;
@@ -351,7 +357,7 @@
                 }
             });
             if(!added) { 
-                tGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; font-weight:bold; color:var(--success);">Önceki aşamada tüm kelimeler kendiliğinden hatırlandığı için tanıma aşamasına gerek yoktur.</div>`; 
+                tGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; font-weight:bold; color:var(--success);">USB aşamasında tüm kelimeler hatırlandığı için tanıma aşamasına gerek yoktur.</div>`; 
                 document.getElementById('undoBtn').style.display = 'none'; 
             }
         } 
@@ -364,7 +370,7 @@
             
             all45Words.forEach(w => {
                 let isSel = testData['TOPLU_TANIMA'][w];
-                let isTarget = targetWordsUpper.includes(w);
+                let isTarget = targetWordsKeys.includes(w);
                 let cls = 'word-btn';
                 if(isSel) cls += isTarget ? ' tt-correct' : ' tt-wrong';
                 grid.innerHTML += `<button class="${cls}" id="tt-${w}" onclick="handleTopluTanimaClick('${w}')">${w}</button>`;
@@ -372,16 +378,13 @@
         }
         else if (key === 'H') {
             document.getElementById('trialTitle').innerText = "Hatırlatma Aşaması (İpuçları)";
-            document.getElementById('trialDesc').innerText = "Önceki aşamada (D10 veya USB) bilinemeyen kelimelerin ipuçları aşağıdadır. Hastaya okuyup bilirse tıklayın.";
+            document.getElementById('trialDesc').innerText = "SADECE D10'da bilinemeyen kelimelerin ipuçları aşağıdadır. Hastaya okuyup bilirse tıklayın.";
             document.getElementById('orderTrackerDiv').style.display = 'block'; document.getElementById('currentOrderDisplay').innerText = "1";
             grid.style.display = 'grid'; tGrid.style.display = 'none';
             let added = false;
-            
-            // DÜZELTME BURADA: Hatırlatma ekranı artık USB'den sonra açılırsa sadece USB'deki eksikleri gösterir
-            let sourceStage = Object.keys(testData['USB']).length > 0 ? 'USB' : 10;
 
             words.forEach((w, i) => {
-                if(!testData[sourceStage][i]) { 
+                if(!testData[10][i]) { 
                     grid.innerHTML += `<button class="word-btn" id="btn-${i}" onclick="handleWordClick(${i})">
                         <span class="orig-order">${i + 1}</span>
                         ${w.k}
@@ -391,7 +394,7 @@
                     added = true;
                 }
             });
-            if(!added) { grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; font-weight:bold; color:var(--success);">Tüm kelimeler kendiliğinden hatırlandığı için ipucu aşamasına gerek yoktur.</div>`; document.getElementById('undoBtn').style.display = 'none'; }
+            if(!added) { grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; font-weight:bold; color:var(--success);">D10 aşamasında tüm kelimeler hatırlandığı için ipucu aşamasına gerek yoktur.</div>`; document.getElementById('undoBtn').style.display = 'none'; }
         }
         else {
             document.getElementById('trialTitle').innerText = key === 'USB' ? "USB (Gecikmeli Hatırlama)" : key + ". Öğrenme Denemesi";
@@ -409,7 +412,10 @@
         document.getElementById('dashboardView').style.display = 'none'; document.getElementById('activeTrialView').style.display = 'block';
     }
 
-    function cancelTrial() { document.getElementById('activeTrialView').style.display='none'; document.getElementById('dashboardView').style.display='block'; }
+    function cancelTrial() { 
+        document.getElementById('activeTrialView').style.display='none'; 
+        document.getElementById('dashboardView').style.display='block'; 
+    }
     
     function handleWordClick(idx) { 
         if(!testData[activeKey][idx]){ 
@@ -426,7 +432,7 @@
 
     function handleTopluTanimaClick(w) {
         let btn = document.getElementById(`tt-${w}`);
-        let isTarget = targetWordsUpper.includes(w);
+        let isTarget = targetWordsKeys.includes(w);
         if(testData['TOPLU_TANIMA'][w]) {
             delete testData['TOPLU_TANIMA'][w];
             btn.classList.remove('tt-correct', 'tt-wrong');
@@ -445,96 +451,197 @@
     }
     
     function saveAndReturn() { 
-        if(activeKey !== 'TANIMA' && activeKey !== 'TOPLU_TANIMA') intrusions[activeKey] = document.getElementById('intrusionInput').value;
-        
-        // D10 VEYA USB BİTTİĞİNDE EKSİK VARSA OTOMATİK HATIRLATMAYA GEÇ
-        if(activeKey === 10 || activeKey === 'USB') {
-            let missedCount = 0;
-            let checkStage = activeKey; // 10 veya 'USB'
-            for(let i=0; i<15; i++) { if(!testData[checkStage][i]) missedCount++; }
+        try {
+            if(activeKey !== 'TANIMA' && activeKey !== 'TOPLU_TANIMA') intrusions[activeKey] = document.getElementById('intrusionInput').value;
             
-            if(missedCount > 0) {
-                updateUIFromData(); 
-                saveToLocal(true); 
-                startTrial('H');   // HER İKİSİNDE DE HATIRLATMAYA (H) GEÇİYOR
-                return;
+            if(activeKey === 'H') testData['H']['_done'] = true;
+            if(activeKey === 'TANIMA') testData['TANIMA']['_done'] = true;
+
+            // D10 KAYDEDİLDİĞİNDE OTOMATİK HATIRLATMAYA GEÇİŞ
+            if(activeKey === 10) {
+                let missedCount = 0;
+                for(let i=0; i<15; i++) { if(!testData[10][i]) missedCount++; }
+                if(missedCount > 0) {
+                    updateUIFromData(); 
+                    saveToLocal(true); 
+                    alert("Bilgi: D10 tamamlandı.\nŞimdi otomatik olarak bilinemeyen kelimeler için 'Hatırlatma (İpuçları)' aşamasına yönlendiriliyorsunuz.");
+                    startTrial('H');   
+                    return; 
+                } else {
+                    testData['H']['_done'] = true; 
+                }
             }
+            // USB KAYDEDİLDİĞİNDE OTOMATİK TANIMAYA GEÇİŞ
+            else if (activeKey === 'USB') {
+                let missedCount = 0;
+                for(let i=0; i<15; i++) { if(!testData['USB'][i]) missedCount++; }
+                if(missedCount > 0) {
+                    updateUIFromData(); 
+                    saveToLocal(true); 
+                    alert("Bilgi: USB tamamlandı.\nŞimdi otomatik olarak bilinemeyen kelimeler için 'Tanıma (Üçlü)' aşamasına yönlendiriliyorsunuz.");
+                    startTrial('TANIMA');   
+                    return; 
+                } else {
+                    testData['TANIMA']['_done'] = true; 
+                }
+            }
+            
+            updateUIFromData(); 
+            saveToLocal(true); 
+        } catch (err) {
+            console.error("Kaydetme Sırasında Hata: ", err);
+            alert("Bir hata oluştu ama verileriniz güvende! Lütfen sayfayı yenileyin.");
         }
         
-        updateUIFromData(); 
-        saveToLocal(true); 
         cancelTrial(); 
     }
     
     function updateUIFromData() {
-        for(let k=1; k<=10; k++) {
-            document.getElementById(`int-${k}`).innerText = intrusions[k] || "";
-            words.forEach((w, i) => document.getElementById(`c-${k}-${i}`).innerText = testData[k][i] || "");
-        }
-        document.getElementById(`int-USB`).innerText = intrusions["USB"] || "";
-        words.forEach((w, i) => document.getElementById(`c-USB-${i}`).innerText = testData["USB"][i] || "");
-        
-        document.getElementById(`int-H`).innerText = intrusions["H"] || "";
-        words.forEach((w, i) => document.getElementById(`c-H-${i}`).innerText = testData["H"][i] ? "+H" : "");
+        try {
+            if(!testData['H']) testData['H'] = {};
+            if(!testData['TANIMA']) testData['TANIMA'] = {};
+            if(!testData['TOPLU_TANIMA']) testData['TOPLU_TANIMA'] = {};
+            if(!testData['USB']) testData['USB'] = {};
+            if(!testData[10]) testData[10] = {};
 
-        words.forEach((w, i) => {
-            let t = targetWordsUpper[i]; let gI = triplets.findIndex(g => g.includes(t)); let sel = testData['TANIMA'][gI];
-            let cell = document.getElementById(`c-TANIMA-${i}`); 
-            
-            let sourceStage = Object.keys(testData['USB']).length > 0 ? 'USB' : 10;
-            let isKnownPreviously = testData[sourceStage][i] !== undefined;
-
-            if(isKnownPreviously) {
-                cell.innerText = "+T";
-                cell.style.color = "var(--success)";
-            } else {
-                cell.innerText = sel===t ? "+T" : (sel ? "-Y" : ""); 
-                cell.style.color = sel===t ? "var(--success)" : "var(--danger)";
+            for(let k=1; k<=10; k++) {
+                let intEl = document.getElementById(`int-${k}`);
+                if(intEl) intEl.innerText = intrusions[k] || "";
+                words.forEach((w, i) => {
+                    let cellEl = document.getElementById(`c-${k}-${i}`);
+                    if(cellEl) cellEl.innerText = testData[k] && testData[k][i] ? testData[k][i] : "";
+                });
             }
-        });
 
-        let topluFalsePositives = [];
-        words.forEach((w, i) => {
-            let t = targetWordsUpper[i];
-            let selToplu = testData['TOPLU_TANIMA'][t];
-            let cellToplu = document.getElementById(`c-TOPLU_TANIMA-${i}`);
-            let isActive = Object.keys(testData['TOPLU_TANIMA']).length > 0;
-            cellToplu.innerText = selToplu ? "+T" : (isActive ? "-Y" : "");
-            cellToplu.style.color = selToplu ? "var(--success)" : "var(--danger)";
-        });
+            let intUsbEl = document.getElementById(`int-USB`);
+            if(intUsbEl) intUsbEl.innerText = intrusions["USB"] || "";
+            words.forEach((w, i) => {
+                let cellEl = document.getElementById(`c-USB-${i}`);
+                if(cellEl) cellEl.innerText = testData["USB"][i] || "";
+            });
+            
+            let intHEl = document.getElementById(`int-H`);
+            if(intHEl) intHEl.innerText = intrusions["H"] || "";
 
-        Object.keys(testData['TOPLU_TANIMA']).forEach(w => { if(!targetWordsUpper.includes(w)) topluFalsePositives.push(w); });
-        document.getElementById('int-TOPLU_TANIMA').innerText = topluFalsePositives.join(', ');
+            words.forEach((w, i) => {
+                let cell = document.getElementById(`c-H-${i}`);
+                if(!cell) return;
+                
+                if (testData['H']['_done']) {
+                    if (!testData[10][i]) { 
+                        let isRemembered = testData["H"][i] !== undefined;
+                        cell.innerText = isRemembered ? "+H" : "-H";
+                        cell.style.color = isRemembered ? "var(--success)" : "var(--danger)";
+                    } else {
+                        cell.innerText = ""; 
+                    }
+                } else {
+                    let isRemembered = testData["H"][i] !== undefined;
+                    cell.innerText = isRemembered ? "+H" : "";
+                    cell.style.color = isRemembered ? "var(--success)" : "";
+                }
+            });
 
-        calculateScores();
+            words.forEach((w, i) => {
+                let t = targetWordsKeys.find(key => targetWordToIdx[key] === i);
+                if(!t) return;
+                let gI = triplets.findIndex(g => g.includes(t)); 
+                let sel = testData['TANIMA'][gI];
+                let cell = document.getElementById(`c-TANIMA-${i}`); 
+                if(!cell) return;
+                
+                if (testData['TANIMA']['_done']) {
+                    if (!testData['USB'][i]) { 
+                        cell.innerText = sel === t ? "+T" : "-Y"; 
+                        cell.style.color = sel === t ? "var(--success)" : "var(--danger)";
+                    } else {
+                        cell.innerText = ""; 
+                    }
+                } else {
+                    if (sel) {
+                        cell.innerText = sel === t ? "+T" : "-Y";
+                        cell.style.color = sel === t ? "var(--success)" : "var(--danger)";
+                    } else {
+                        cell.innerText = "";
+                    }
+                }
+            });
+
+            let topluFalsePositives = [];
+            words.forEach((w, i) => {
+                let t = targetWordsKeys.find(key => targetWordToIdx[key] === i);
+                if(!t) return;
+                let selToplu = testData['TOPLU_TANIMA'][t];
+                let cellToplu = document.getElementById(`c-TOPLU_TANIMA-${i}`);
+                if(!cellToplu) return;
+
+                let isActive = Object.keys(testData['TOPLU_TANIMA']).length > 0;
+                cellToplu.innerText = selToplu ? "+T" : (isActive ? "-Y" : "");
+                cellToplu.style.color = selToplu ? "var(--success)" : "var(--danger)";
+            });
+
+            Object.keys(testData['TOPLU_TANIMA']).forEach(w => { 
+                if(w !== '_done' && !targetWordsKeys.includes(w)) topluFalsePositives.push(w); 
+            });
+            let intTopluEl = document.getElementById('int-TOPLU_TANIMA');
+            if(intTopluEl) intTopluEl.innerText = topluFalsePositives.join(', ');
+
+            calculateScores();
+        } catch(e) {
+            console.error("Arayüz Güncelleme Hatası:", e);
+        }
     }
 
     function calculateScores() {
-        document.getElementById('resAnlik').innerText = Object.keys(testData[1]).length;
-        let tot = 0, mx = 0; for(let i=1; i<=10; i++) { let c = Object.keys(testData[i]).length; tot+=c; if(c>mx) mx=c; }
-        document.getElementById('resToplam').innerText = tot; document.getElementById('resEnYuksek').innerText = mx;
-        document.getElementById('resUSB').innerText = Object.keys(testData['USB']).length;
-        
-        let ok = 0, err = 0; 
-        let sourceStage = Object.keys(testData['USB']).length > 0 ? 'USB' : 10;
-
-        words.forEach((w, i) => {
-            let isKnownPreviously = testData[sourceStage][i] !== undefined;
-            if(isKnownPreviously) {
-                ok++; 
-            } else {
-                let t = targetWordsUpper[i]; let gI = triplets.findIndex(g => g.includes(t));
-                let sel = testData['TANIMA'][gI];
-                if(sel === t) ok++;
-                else if (sel) err++;
+        try {
+            let anlik = testData[1] ? Object.keys(testData[1]).filter(k => k !== '_done').length : 0;
+            document.getElementById('resAnlik').innerText = anlik;
+            
+            let tot = 0, mx = 0; 
+            for(let i=1; i<=10; i++) { 
+                if(testData[i]) {
+                    let c = Object.keys(testData[i]).filter(k => k !== '_done').length; 
+                    tot += c; 
+                    if(c > mx) mx = c; 
+                }
             }
-        });
-        document.getElementById('resTanima').innerText = ok; document.getElementById('resYanlisTanima').innerText = err;
+            document.getElementById('resToplam').innerText = tot; 
+            document.getElementById('resEnYuksek').innerText = mx;
+            
+            let usbCount = testData['USB'] ? Object.keys(testData['USB']).filter(k => k !== '_done').length : 0;
+            document.getElementById('resUSB').innerText = usbCount;
+            
+            let ok = 0, err = 0; 
+            words.forEach((w, i) => {
+                let isKnownInUSB = testData['USB'] && testData['USB'][i] !== undefined;
+                if(isKnownInUSB) {
+                    ok++; 
+                } else {
+                    let t = targetWordsKeys.find(key => targetWordToIdx[key] === i);
+                    if(t) {
+                        let gI = triplets.findIndex(g => g.includes(t));
+                        let sel = testData['TANIMA'] ? testData['TANIMA'][gI] : undefined;
+                        if(sel === t) { ok++; } 
+                        else if (sel || (testData['TANIMA'] && testData['TANIMA']['_done'])) { err++; } 
+                    }
+                }
+            });
+            document.getElementById('resTanima').innerText = ok; 
+            document.getElementById('resYanlisTanima').innerText = err;
 
-        let okToplu = 0, errToplu = 0;
-        Object.keys(testData['TOPLU_TANIMA']).forEach(w => { if(targetWordsUpper.includes(w)) okToplu++; else errToplu++; });
-        document.getElementById('resTopluT').innerText = okToplu;
-        document.getElementById('resTopluY').innerText = errToplu;
+            let okToplu = 0, errToplu = 0;
+            if(testData['TOPLU_TANIMA']) {
+                Object.keys(testData['TOPLU_TANIMA']).forEach(w => { 
+                    if(w !== '_done') {
+                        if(targetWordsKeys.includes(w)) okToplu++; else errToplu++; 
+                    }
+                });
+            }
+            document.getElementById('resTopluT').innerText = okToplu;
+            document.getElementById('resTopluY').innerText = errToplu;
+        } catch(e) {
+            console.error("Skor Hesaplama Hatası:", e);
+        }
     }
 
     function toggleTheme() { 
@@ -545,9 +652,11 @@
     }
     
     function preparePrint() { 
-        let siraText = document.getElementById('siraNo').value;
-        document.getElementById('printSira').innerText = siraText.replace("(Kayıtta: ", "").replace(")", "");
-        document.getElementById('printUID').innerText = document.getElementById('displayUID').value; 
+        let rawDate = document.getElementById('pDate').value;
+        let formattedDate = rawDate ? rawDate.split('-').reverse().join('.') : "......................";
+        
+        document.getElementById('printPatientName').innerText = document.getElementById('pName').value || "......................";
+        document.getElementById('printDate').innerText = formattedDate;
         document.getElementById('printAssessor').innerText = document.getElementById('assessorName').value || "......................"; 
         window.print(); 
     }
