@@ -332,17 +332,18 @@
 
         if(key === 'TANIMA') {
             document.getElementById('trialTitle').innerText = "Tanıma (Üçlü Gruplar)";
-            document.getElementById('trialDesc').innerText = "Sadece USB'de hatırlanamayan kelimelerin üçlü grupları. Hastaya okuyup hangisini söylediğini seçiniz.";
+            document.getElementById('trialDesc').innerText = "Önceki aşamada hatırlanamayan kelimelerin üçlü grupları. Hastaya okuyup hangisini söylediğini seçiniz.";
             document.getElementById('orderTrackerDiv').style.display = 'none'; document.getElementById('intrusionBox').style.display = 'none';
             grid.style.display = 'none'; tGrid.style.display = 'block';
             let added = false;
             
-            // DÜZELTİLEN KISIM: İndeks kontrolü artık doğru hedef kelimenin indeksine (wordIndex) göre yapılıyor.
+            let sourceStage = Object.keys(testData['USB']).length > 0 ? 'USB' : 10;
+            
             triplets.forEach((g, gI) => {
                 let targetWord = g.find(w => targetWordsUpper.includes(w));
                 let wordIndex = targetWordsUpper.indexOf(targetWord);
                 
-                if(!testData['USB'][wordIndex]) { // YALNIZCA USB'DE BİLİNMEYENLERİ GÖSTER
+                if(!testData[sourceStage][wordIndex]) { 
                     let h = `<div class="triplet-row"><div style="width:24px; font-weight:600; color:var(--text-muted);">${gI+1}.</div><div class="triplet-btns">`;
                     g.forEach(w => h += `<button class="word-btn" style="flex:1" id="t-${gI}-${w}" onclick="handleTanimaClick(${gI},'${w}')">${w}</button>`);
                     tGrid.innerHTML += h + `</div></div>`;
@@ -350,7 +351,7 @@
                 }
             });
             if(!added) { 
-                tGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; font-weight:bold; color:var(--success);">USB aşamasında tüm kelimeler kendiliğinden hatırlandığı için tanıma aşamasına gerek yoktur.</div>`; 
+                tGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; font-weight:bold; color:var(--success);">Önceki aşamada tüm kelimeler kendiliğinden hatırlandığı için tanıma aşamasına gerek yoktur.</div>`; 
                 document.getElementById('undoBtn').style.display = 'none'; 
             }
         } 
@@ -370,13 +371,17 @@
             });
         }
         else if (key === 'H') {
-            document.getElementById('trialTitle').innerText = "D10 - Hatırlatma Aşaması";
-            document.getElementById('trialDesc').innerText = "D10'da bilinemeyen kelimelerin ipuçları aşağıdadır. Hastaya okuyup bilirse tıklayın.";
+            document.getElementById('trialTitle').innerText = "Hatırlatma Aşaması (İpuçları)";
+            document.getElementById('trialDesc').innerText = "Önceki aşamada (D10 veya USB) bilinemeyen kelimelerin ipuçları aşağıdadır. Hastaya okuyup bilirse tıklayın.";
             document.getElementById('orderTrackerDiv').style.display = 'block'; document.getElementById('currentOrderDisplay').innerText = "1";
             grid.style.display = 'grid'; tGrid.style.display = 'none';
             let added = false;
+            
+            // DÜZELTME BURADA: Hatırlatma ekranı artık USB'den sonra açılırsa sadece USB'deki eksikleri gösterir
+            let sourceStage = Object.keys(testData['USB']).length > 0 ? 'USB' : 10;
+
             words.forEach((w, i) => {
-                if(!testData[10][i]) { 
+                if(!testData[sourceStage][i]) { 
                     grid.innerHTML += `<button class="word-btn" id="btn-${i}" onclick="handleWordClick(${i})">
                         <span class="orig-order">${i + 1}</span>
                         ${w.k}
@@ -386,7 +391,7 @@
                     added = true;
                 }
             });
-            if(!added) { grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; font-weight:bold; color:var(--success);">D10'da tüm kelimeler bilindiği için hatırlatma aşamasına gerek yoktur.</div>`; document.getElementById('undoBtn').style.display = 'none'; }
+            if(!added) { grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; font-weight:bold; color:var(--success);">Tüm kelimeler kendiliğinden hatırlandığı için ipucu aşamasına gerek yoktur.</div>`; document.getElementById('undoBtn').style.display = 'none'; }
         }
         else {
             document.getElementById('trialTitle').innerText = key === 'USB' ? "USB (Gecikmeli Hatırlama)" : key + ". Öğrenme Denemesi";
@@ -442,23 +447,16 @@
     function saveAndReturn() { 
         if(activeKey !== 'TANIMA' && activeKey !== 'TOPLU_TANIMA') intrusions[activeKey] = document.getElementById('intrusionInput').value;
         
-        if(activeKey === 10) {
+        // D10 VEYA USB BİTTİĞİNDE EKSİK VARSA OTOMATİK HATIRLATMAYA GEÇ
+        if(activeKey === 10 || activeKey === 'USB') {
             let missedCount = 0;
-            for(let i=0; i<15; i++) { if(!testData[10][i]) missedCount++; }
+            let checkStage = activeKey; // 10 veya 'USB'
+            for(let i=0; i<15; i++) { if(!testData[checkStage][i]) missedCount++; }
+            
             if(missedCount > 0) {
                 updateUIFromData(); 
                 saveToLocal(true); 
-                startTrial('H');   
-                return;
-            }
-        }
-        else if (activeKey === 'USB') {
-            let missedCount = 0;
-            for(let i=0; i<15; i++) { if(!testData['USB'][i]) missedCount++; }
-            if(missedCount > 0) {
-                updateUIFromData(); 
-                saveToLocal(true); 
-                startTrial('TANIMA');   
+                startTrial('H');   // HER İKİSİNDE DE HATIRLATMAYA (H) GEÇİYOR
                 return;
             }
         }
@@ -483,9 +481,16 @@
             let t = targetWordsUpper[i]; let gI = triplets.findIndex(g => g.includes(t)); let sel = testData['TANIMA'][gI];
             let cell = document.getElementById(`c-TANIMA-${i}`); 
             
-            // DÜZELTİLEN KISIM: Artık Tanıma sütunu USB'yi kopyalamıyor. Sadece Tanıma ekranında seçilenleri gösteriyor.
-            cell.innerText = sel===t ? "+T" : (sel ? "-Y" : ""); 
-            cell.style.color = sel===t ? "var(--success)" : "var(--danger)";
+            let sourceStage = Object.keys(testData['USB']).length > 0 ? 'USB' : 10;
+            let isKnownPreviously = testData[sourceStage][i] !== undefined;
+
+            if(isKnownPreviously) {
+                cell.innerText = "+T";
+                cell.style.color = "var(--success)";
+            } else {
+                cell.innerText = sel===t ? "+T" : (sel ? "-Y" : ""); 
+                cell.style.color = sel===t ? "var(--success)" : "var(--danger)";
+            }
         });
 
         let topluFalsePositives = [];
@@ -511,10 +516,12 @@
         document.getElementById('resUSB').innerText = Object.keys(testData['USB']).length;
         
         let ok = 0, err = 0; 
+        let sourceStage = Object.keys(testData['USB']).length > 0 ? 'USB' : 10;
+
         words.forEach((w, i) => {
-            let isKnownInUSB = testData['USB'][i] !== undefined;
-            if(isKnownInUSB) {
-                ok++; // DÜZELTME KORUNDU: USB'de bilinen kelime puan olarak (+) sayılmaya devam eder.
+            let isKnownPreviously = testData[sourceStage][i] !== undefined;
+            if(isKnownPreviously) {
+                ok++; 
             } else {
                 let t = targetWordsUpper[i]; let gI = triplets.findIndex(g => g.includes(t));
                 let sel = testData['TANIMA'][gI];
