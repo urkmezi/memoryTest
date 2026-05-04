@@ -1,66 +1,120 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Öktem-SBST Klinik Asistan</title>
     <style>
-        :root { --primary: #1e40af; --secondary: #3b82f6; --success: #16a34a; --warning: #d97706; --danger: #dc2626; --bg: #f8fafc; --text: #0f172a; --border: #cbd5e1; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; font-size: 14px; }
-        .container { max-width: 1200px; margin: auto; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        /* GitHub Stili Renk Paleti (Light & Dark Mode) */
+        :root[data-theme="light"] {
+            --bg-body: #f6f8fa;
+            --bg-panel: #ffffff;
+            --text-main: #24292f;
+            --text-muted: #57606a;
+            --border: #d0d7de;
+            --primary: #0969da;
+            --primary-hover: #035cc5;
+            --secondary: #f3f4f6;
+            --secondary-hover: #ebecf0;
+            --success: #2da44e;
+            --danger: #cf222e;
+            --warning: #bf8700;
+            --highlight-yellow: #fff8c5;
+            --highlight-purple: #f3f0ff;
+            --purple-text: #8250df;
+            --btn-text: #24292f;
+            --shadow: 0 3px 6px rgba(140,149,159,0.15);
+        }
+
+        :root[data-theme="dark"] {
+            --bg-body: #0d1117;
+            --bg-panel: #161b22;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --border: #30363d;
+            --primary: #58a6ff;
+            --primary-hover: #79c0ff;
+            --secondary: #21262d;
+            --secondary-hover: #30363d;
+            --success: #3fb950;
+            --danger: #f85149;
+            --warning: #d29922;
+            --highlight-yellow: rgba(210, 153, 34, 0.15);
+            --highlight-purple: rgba(130, 80, 223, 0.15);
+            --purple-text: #bc8cff;
+            --btn-text: #c9d1d9;
+            --shadow: 0 3px 6px rgba(0,0,0,0.4);
+        }
+
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; padding: 20px; font-size: 14px; transition: background 0.3s, color 0.3s; }
         
-        h2, h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        .container { max-width: 1200px; margin: auto; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px; transition: background 0.3s, border-color 0.3s; }
         
+        .top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px; }
+        h2, h3 { color: var(--text-main); margin: 0; font-weight: 600; }
+        
+        /* Tema Değiştirici Buton */
+        .theme-toggle { background: var(--secondary); border: 1px solid var(--border); color: var(--text-main); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 16px; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .theme-toggle:hover { background: var(--secondary-hover); }
+
         /* Üst Bilgi Alanı */
         .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .input-group { display: flex; flex-direction: column; }
-        .input-group label { font-weight: bold; margin-bottom: 5px; color: #475569; font-size: 11px; text-transform: uppercase; }
-        .input-group input, .input-group select, .uid-box { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background-color: white; min-height: 20px; }
-        .uid-box { background: #f1f5f9; font-family: monospace; font-weight: bold; color: var(--primary); }
+        .input-group label { font-weight: 600; margin-bottom: 6px; color: var(--text-main); font-size: 12px; }
+        .input-group input, .input-group select, .uid-box { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background-color: var(--bg-body); color: var(--text-main); outline: none; }
+        .input-group input:focus, .input-group select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3); }
+        .uid-box { background: var(--secondary); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-weight: 600; color: var(--primary); display: flex; align-items: center; }
 
-        .alert { background: #fef2f2; color: var(--danger); padding: 10px; border-radius: 6px; font-weight: bold; display: none; margin-top: 10px; border-left: 4px solid var(--danger); }
+        .alert { background: rgba(207, 34, 46, 0.1); color: var(--danger); padding: 12px; border-radius: 6px; font-weight: 600; display: none; margin-top: 10px; border: 1px solid rgba(207, 34, 46, 0.4); }
 
-        /* Dashboard */
+        /* Dashboard Tablosu */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: center; }
-        th, td { border: 1px solid var(--border); padding: 6px 4px; font-size: 13px; }
-        th { background: #f1f5f9; }
-        .word-cell { text-align: left; font-weight: bold; background: #f8fafc; width: 120px; }
-        .btn-start { background: var(--secondary); color: white; border: none; padding: 8px 4px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; width: 100%; transition: 0.2s; }
-        
+        th, td { border: 1px solid var(--border); padding: 8px 6px; font-size: 13px; color: var(--text-main); }
+        th { background: var(--secondary); font-weight: 600; }
+        .word-cell { text-align: left; font-weight: 600; background: var(--bg-panel); width: 120px; }
+        .btn-start { background: var(--secondary); color: var(--primary); border: 1px solid var(--border); padding: 6px 4px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; width: 100%; transition: 0.2s; }
+        .btn-start:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .intrusion-row td { background: rgba(207, 34, 46, 0.05); color: var(--danger); font-size: 11px; font-style: italic; }
+
         /* Test Ekranları */
         #activeTrialView { display: none; }
-        .trial-header { display: flex; justify-content: space-between; align-items: center; background: #eff6ff; padding: 15px; border-radius: 8px; border-left: 5px solid var(--secondary); margin-bottom: 20px; }
+        .trial-header { display: flex; justify-content: space-between; align-items: center; background: var(--secondary); padding: 16px; border-radius: 6px; border: 1px solid var(--border); border-left: 4px solid var(--primary); margin-bottom: 20px; }
         
-        .btn-back { background: #64748b; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
+        .btn-back { background: transparent; color: var(--text-muted); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-back:hover { background: var(--secondary); color: var(--text-main); }
         
-        .word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        .word-btn { position: relative; background: white; border: 2px solid var(--border); padding: 15px 5px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; min-height: 70px; }
-        .word-btn.selected { background: #dbeafe; border-color: var(--secondary); color: var(--primary); }
-        .word-btn.tanima-selected { background: #f3e8ff; border-color: #9333ea; color: #6b21a8; box-shadow: inset 0 0 0 2px #9333ea; }
+        .word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .word-btn { position: relative; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); padding: 15px 5px; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; min-height: 70px; transition: all 0.1s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .word-btn:hover { border-color: var(--text-muted); }
+        .word-btn.selected { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .word-btn.tanima-selected { background: var(--highlight-purple); border-color: var(--purple-text); color: var(--purple-text); }
         
-        .order-badge { position: absolute; top: -8px; right: -8px; background: var(--secondary); color: white; width: 24px; height: 24px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; }
-        .word-btn.selected .order-badge { display: flex; }
+        .order-badge { position: absolute; top: -8px; right: -8px; background: var(--bg-panel); color: var(--text-main); width: 24px; height: 24px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 12px; border: 2px solid var(--border); font-weight: bold; }
+        .word-btn.selected .order-badge { display: flex; color: var(--primary); }
 
-        .action-bars { display: flex; gap: 15px; justify-content: center; }
-        .btn-large { padding: 12px 25px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; flex: 1; max-width: 300px; }
-        .btn-save { background: var(--success); }
-        .btn-undo { background: var(--danger); }
+        .action-bars { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+        .btn-large { padding: 10px 24px; font-size: 14px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1; max-width: 300px; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-save { background: var(--success); color: white; border-color: var(--success); }
+        .btn-save:hover { background: #238636; border-color: #238636; }
+        .btn-undo { background: var(--secondary); color: var(--danger); }
+        .btn-undo:hover { background: rgba(207, 34, 46, 0.1); border-color: var(--danger); }
 
         /* Sonuçlar */
         .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
-        .result-card { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 8px; text-align: center; }
-        .result-card .val { display: block; font-size: 24px; font-weight: bold; color: var(--success); margin-top: 5px; }
+        .result-card { background: var(--bg-body); border: 1px solid var(--border); padding: 16px; border-radius: 6px; text-align: center; }
+        .result-card .val { display: block; font-size: 24px; font-weight: 600; color: var(--text-main); margin-top: 8px; }
 
-        .triplet-row { display: flex; gap: 10px; margin-bottom: 10px; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .triplet-row { display: flex; gap: 10px; margin-bottom: 12px; padding: 12px; background: var(--secondary); border-radius: 6px; border: 1px solid var(--border); align-items: center; }
 
-        /* Yazdırma Ayarları */
+        /* Yazdırma Ayarları (Yazdırırken Koyu Temayı İptal Et) */
         .print-only { display: none; }
         @media print {
-            .btn-start, .action-bars, button, .btn-back, .btn-undo, .no-print { display: none !important; }
-            body { background: white; padding: 0; }
-            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+            :root { --bg-body: #fff; --bg-panel: #fff; --text-main: #000; --text-muted: #555; --border: #ccc; --secondary: #f9f9f9; }
+            .btn-start, .action-bars, button, .btn-back, .btn-undo, .no-print, .theme-toggle { display: none !important; }
+            body { background: white; padding: 0; color: black; }
+            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
             .print-only { display: block; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
-            .input-group input, .input-group select { border: none; font-weight: bold; padding: 0; }
+            .input-group input, .input-group select { border: none; font-weight: bold; padding: 0; background: transparent; }
             .result-card { border: 1px solid #ccc; background: transparent; }
         }
     </style>
@@ -73,11 +127,14 @@
         <p>Hasta Adı Soyadı: __________________________________________________</p>
     </div>
 
-    <h2>Klinik Kayıt Paneli</h2>
+    <div class="top-bar no-print">
+        <h2>Klinik Kayıt Paneli</h2>
+        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌗 Koyu Tema</button>
+    </div>
     
     <div class="header-grid">
         <div class="input-group"><label>Protokol / Unique ID</label><div class="uid-box" id="displayUID"></div></div>
-        <div class="input-group no-print"><label>Yaş</label><input type="number" id="pAge"></div>
+        <div class="input-group no-print"><label>Yaş</label><input type="number" id="pAge" placeholder="Örn: 65"></div>
         <div class="input-group"><label>Eğitim Düzeyi</label>
             <select id="pEdu">
                 <option value="">Seçiniz...</option>
@@ -86,66 +143,86 @@
             </select>
         </div>
         <div class="input-group"><label>Test Tarihi</label><input type="date" id="pDate"></div>
-        <div class="input-group"><label>Sayı Menzili</label><input type="number" id="digitSpan" oninput="checkMenzil()"></div>
+        <div class="input-group"><label>Sayı Menzili</label><input type="number" id="digitSpan" oninput="checkMenzil()" placeholder="Ön Test Puanı"></div>
     </div>
     
-    <div id="menzilAlert" class="alert">DİKKAT: Sayı menzili düşük (≤3). Listeyi kısaltmayı düşünün!</div>
+    <div id="menzilAlert" class="alert">⚠️ DİKKAT: Sayı menzili düşük (≤3). Yönergeye göre listeyi 10 veya 5 kelimeyle uygulayınız![cite: 1]</div>
 
     <table>
         <thead>
             <tr>
                 <th rowspan="2">Kelimeler</th>
                 <th colspan="10">Öğrenme Denemeleri</th>
-                <th rowspan="2" style="background:#fef08a; width:65px;">USB</th>
-                <th rowspan="2" style="background:#e9d5ff; width:65px;">Tanıma</th>
+                <th rowspan="2" style="background:var(--highlight-yellow); width:65px;">USB</th>
+                <th rowspan="2" style="background:var(--highlight-purple); width:65px;">Tanıma</th>
             </tr>
             <tr id="tableHeaders"></tr>
         </thead>
         <tbody id="mainTableBody"></tbody>
-        <tbody id="intrusionBody"><tr class="intrusion-row"><td style="font-weight:bold; background:#f8fafc;">Hatalar</td></tr></tbody>
+        <tbody id="intrusionBody"><tr class="intrusion-row"><td style="font-weight:600; background:var(--bg-panel);">Hatalar</td></tr></tbody>
     </table>
 
+    <h3 style="margin-top: 30px; font-size: 16px;">Test Sonuçları</h3>
     <div class="results-grid">
         <div class="result-card">Anlık Bellek<span class="val" id="resAnlik">0</span></div>
         <div class="result-card">Toplam Öğrenme<span class="val" id="resToplam">0</span></div>
         <div class="result-card">En Yüksek<span class="val" id="resEnYuksek">0</span></div>
-        <div class="result-card" style="background:#fefce8;">USB Kendiliğinden<span class="val" id="resUSB">0</span></div>
-        <div class="result-card" style="background:#faf5ff;">Tanıma Doğru (+T)<span class="val" id="resTanima">0</span></div>
-        <div class="result-card" style="background:#fef2f2;">Tanıma Yanlış (-Y)<span class="val" id="resYanlisTanima">0</span></div>
+        <div class="result-card" style="border-top: 3px solid var(--warning);">USB Kendiliğinden<span class="val" id="resUSB" style="color:var(--warning);">0</span></div>
+        <div class="result-card" style="border-top: 3px solid var(--purple-text);">Tanıma Doğru (+T)<span class="val" id="resTanima" style="color:var(--purple-text);">0</span></div>
+        <div class="result-card" style="border-top: 3px solid var(--danger);">Tanıma Yanlış (-Y)<span class="val" id="resYanlisTanima" style="color:var(--danger);">0</span></div>
     </div>
     
-    <div style="margin-top: 20px; text-align: right;" class="no-print">
-        <button class="btn-large btn-save" style="width: auto;" onclick="window.print()">🖨️ Raporu Yazdır</button>
+    <div style="margin-top: 24px; text-align: right;" class="no-print">
+        <button class="btn-large" style="display:inline-flex; width: auto; background:var(--secondary); color:var(--text-main);" onclick="window.print()">🖨️ PDF / Yazdır</button>
     </div>
 </div>
 
 <!-- TEST EKRANI -->
 <div class="container" id="activeTrialView">
-    <button class="btn-back" onclick="cancelTrial()">← İptal Et ve Tabloya Dön</button>
+    <button class="btn-back" onclick="cancelTrial()">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path fill-rule="evenodd" d="M7.78 12.53a.75.75 0 01-1.06 0L2.47 8.28a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L4.81 7h7.44a.75.75 0 010 1.5H4.81l2.97 2.97a.75.75 0 010 1.06z"></path></svg>
+        İptal Et
+    </button>
     
     <div class="trial-header">
         <div>
-            <h2 style="margin:0;" id="trialTitle"></h2>
-            <p style="margin:5px 0 0 0; color:#475569;" id="trialDesc"></p>
+            <h2 style="margin:0; font-size:18px;" id="trialTitle"></h2>
+            <p style="margin:4px 0 0 0; color:var(--text-muted); font-size:13px;" id="trialDesc"></p>
         </div>
-        <div style="font-size:24px; font-weight:bold; color:var(--success);" id="orderTrackerDiv">Sıra: <span id="currentOrderDisplay">1</span></div>
+        <div style="font-size:20px; font-weight:600; color:var(--success);" id="orderTrackerDiv">Sıra: <span id="currentOrderDisplay">1</span></div>
     </div>
 
     <div class="word-grid" id="wordGrid"></div>
     <div id="tanimaGrid" style="display:none; margin-bottom:20px;"></div>
 
-    <div class="extra-inputs" id="intrusionBox">
-        <label style="color:var(--danger); font-weight:bold;">Öğrenme Yanlışları / Perseverasyonlar:</label>
-        <input type="text" id="intrusionInput" placeholder="Listede olmayan söylenen kelimeler...">
+    <div class="input-group" id="intrusionBox" style="background:var(--secondary); padding:16px; border-radius:6px; border:1px solid var(--border);">
+        <label style="color:var(--danger);">Öğrenme Yanlışları / Perseverasyonlar (Virgülle Ayırın):</label>
+        <input type="text" id="intrusionInput" placeholder="Örn: Pencere, Masa...">
     </div>
 
     <div class="action-bars">
         <button class="btn-large btn-undo" id="undoBtn" onclick="undoLastClick()">↩ Geri Al</button>
-        <button class="btn-large btn-save" onclick="saveAndReturn()">💾 Kaydet</button>
+        <button class="btn-large btn-save" onclick="saveAndReturn()">💾 Kaydet ve Tabloya Dön</button>
     </div>
 </div>
 
 <script>
+    // Tema Yönetimi
+    function toggleTheme() {
+        const root = document.documentElement;
+        const btn = document.getElementById('themeBtn');
+        if (root.getAttribute('data-theme') === 'light') {
+            root.setAttribute('data-theme', 'dark');
+            localStorage.setItem('sbstTheme', 'dark');
+            btn.innerHTML = '☀️ Açık Tema';
+        } else {
+            root.setAttribute('data-theme', 'light');
+            localStorage.setItem('sbstTheme', 'light');
+            btn.innerHTML = '🌗 Koyu Tema';
+        }
+    }
+
+    // Kelime Listeleri[cite: 3]
     const words = [
         {k: "Davul", hint: "Çalgı"}, {k: "Perde", hint: "Cama takılır"}, {k: "Zil", hint: "Ses çıkarır"}, 
         {k: "Kahve", hint: "Sıcak içecek"}, {k: "Okul", hint: "Çocuklar gider"}, {k: "Anne", hint: "Çok sevdiğimiz"}, 
@@ -154,6 +231,7 @@
         {k: "Renk", hint: "Gökkuşağı"}, {k: "Ev", hint: "Yaşadığımız yer"}, {k: "Nehir", hint: "Akarsu"}
     ];
     
+    // Zorunlu Seçme Üçlüleri[cite: 1]
     const triplets = [
         ["DUVAR", "DAVUL", "ZURNA"], ["TARLA", "ÇİFTÇİ", "ÇİFTLİK"], ["KAPI", "PENCERE", "PERDE"],
         ["BOĞAZ", "BURUN", "KULAK"], ["ÇAN", "ZİL", "HENDEK"], ["TAVUK", "HİNDİ", "GİTAR"],
@@ -168,7 +246,11 @@
     let activeKey = null, clickOrder = 1, history = [];
 
     window.onload = () => {
-        // Unique ID Oluştur
+        // Kaydedilmiş Temayı Yükle
+        const savedTheme = localStorage.getItem('sbstTheme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeBtn').innerHTML = savedTheme === 'dark' ? '☀️ Açık Tema' : '🌗 Koyu Tema';
+
         const uid = "SBST-" + new Date().getFullYear() + "-" + Math.floor(1000 + Math.random() * 9000);
         document.getElementById('displayUID').innerText = uid;
         document.getElementById('pDate').valueAsDate = new Date();
@@ -181,14 +263,15 @@
             headers.innerHTML += `<th><button class="btn-start" onclick="startTrial(${i})">D${i}</button></th>`;
             intRow.innerHTML += `<td id="int-${i}"></td>`;
         }
-        headers.innerHTML += `<th style="background:#fef08a"><button class="btn-start" style="background:#ca8a04" onclick="startTrial('USB')">USB</button></th>`;
-        headers.innerHTML += `<th style="background:#e9d5ff"><button class="btn-start" style="background:#9333ea" onclick="startTrial('TANIMA')">Tanıma</button></th>`;
-        intRow.innerHTML += `<td id="int-USB" style="background:#fef08a"></td><td style="background:#e9d5ff"></td>`;
+        headers.innerHTML += `<th style="background:var(--highlight-yellow);"><button class="btn-start" style="background:transparent; border-color:var(--warning); color:var(--warning);" onclick="startTrial('USB')">USB</button></th>`;
+        headers.innerHTML += `<th style="background:var(--highlight-purple);"><button class="btn-start" style="background:transparent; border-color:var(--purple-text); color:var(--purple-text);" onclick="startTrial('TANIMA')">Tanıma</button></th>`;
+        intRow.innerHTML += `<td id="int-USB" style="background:var(--highlight-yellow);"></td><td style="background:var(--highlight-purple);"></td>`;
 
         words.forEach((w, idx) => {
             let r = `<tr><td class="word-cell">${w.k}</td>`;
             for(let i=1; i<=10; i++) r += `<td id="c-${i}-${idx}"></td>`;
-            r += `<td id="c-USB-${idx}" style="background:#fef08a;"></td><td id="c-TANIMA-${idx}" style="background:#e9d5ff;"></td></tr>`;
+            r += `<td id="c-USB-${idx}" style="background:var(--highlight-yellow); font-weight:bold; color:var(--warning);"></td>`;
+            r += `<td id="c-TANIMA-${idx}" style="background:var(--highlight-purple); font-weight:bold;"></td></tr>`;
             tbody.innerHTML += r;
         });
     };
@@ -200,22 +283,25 @@
         grid.innerHTML = ''; tanimaGrid.innerHTML = '';
         
         if(key === 'TANIMA') {
-            document.getElementById('trialTitle').innerText = "Tanıma (Üçlü Gruplar)[cite: 1]";
+            document.getElementById('trialTitle').innerText = "Tanıma (Üçlü Gruplar)";
+            document.getElementById('trialDesc').innerText = "Her satırdaki 3 kelimeden hangisini söylediğini seçiniz.";
             document.getElementById('orderTrackerDiv').style.display = 'none';
             document.getElementById('intrusionBox').style.display = 'none';
             grid.style.display = 'none'; tanimaGrid.style.display = 'block';
             triplets.forEach((group, i) => {
-                let html = `<div class="triplet-row"><div style="width:20px; font-weight:bold;">${i+1}</div>`;
+                let html = `<div class="triplet-row"><div style="width:24px; font-weight:600; color:var(--text-muted);">${i+1}.</div>`;
                 group.forEach(w => html += `<button class="word-btn" style="flex:1; min-height:50px;" id="t-${i}-${w}" onclick="handleTanimaClick(${i},'${w}')">${w}</button>`);
                 tanimaGrid.innerHTML += html + `</div>`;
             });
         } else {
-            document.getElementById('trialTitle').innerText = key === 'USB' ? "USB Hatırlama" : key + ". Deneme";
+            document.getElementById('trialTitle').innerText = key === 'USB' ? "USB (Uzun Süreli Bellek)" : key + ". Öğrenme Denemesi";
+            document.getElementById('trialDesc').innerText = "Söylenen kelimelere sırayla dokunun.";
             document.getElementById('orderTrackerDiv').style.display = 'block';
             document.getElementById('currentOrderDisplay').innerText = "1";
             grid.style.display = 'grid'; tanimaGrid.style.display = 'none';
             words.forEach((w, idx) => {
-                grid.innerHTML += `<button class="word-btn" id="btn-${idx}" onclick="handleWordClick(${idx})">${w.k}<div class="order-badge" id="badge-${idx}"></div></button>`;
+                let showHint = (key === 10) ? `<div style="font-size:11px; color:var(--warning); font-weight:normal; margin-top:4px;">${w.hint}</div>` : '';
+                grid.innerHTML += `<button class="word-btn" id="btn-${idx}" onclick="handleWordClick(${idx})">${w.k}${showHint}<div class="order-badge" id="badge-${idx}"></div></button>`;
             });
         }
         document.getElementById('dashboardView').style.display = 'none';
@@ -237,12 +323,16 @@
 
     function handleTanimaClick(groupI, word) {
         triplets[groupI].forEach(w => document.getElementById(`t-${groupI}-${w}`).classList.remove('tanima-selected'));
-        testData['TANIMA'][groupI] = word;
-        document.getElementById(`t-${groupI}-${word}`).classList.add('tanima-selected');
+        if(testData['TANIMA'][groupI] === word) {
+            delete testData['TANIMA'][groupI];
+        } else {
+            testData['TANIMA'][groupI] = word;
+            document.getElementById(`t-${groupI}-${word}`).classList.add('tanima-selected');
+        }
     }
 
     function undoLastClick() {
-        if(!history.length) return;
+        if(!history.length || activeKey === 'TANIMA') return;
         const last = history.pop(); delete testData[activeKey][last];
         clickOrder--; document.getElementById('currentOrderDisplay').innerText = clickOrder;
         document.getElementById(`btn-${last}`).classList.remove('selected');
@@ -260,7 +350,7 @@
                 let sel = testData['TANIMA'][gIdx];
                 let cell = document.getElementById(`c-TANIMA-${i}`);
                 cell.innerText = sel === target ? "+T" : (sel ? "-Y" : "");
-                cell.style.color = sel === target ? "green" : "red";
+                cell.style.color = sel === target ? "var(--success)" : "var(--danger)";
             });
         }
         calculateScores(); cancelTrial();
