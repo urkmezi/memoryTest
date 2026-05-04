@@ -13,6 +13,7 @@
             --highlight-yellow: #fff8c5; --highlight-purple: #f3f0ff; --purple-text: #8250df;
             --highlight-blue: #e0f2fe; --blue-text: #0284c7;
             --highlight-pink: #fce7f3; --pink-text: #db2777;
+            --highlight-green: #dcfce7; --green-text: #166534;
             --shadow: 0 3px 6px rgba(140,149,159,0.15);
         }
         :root[data-theme="dark"] {
@@ -23,6 +24,7 @@
             --purple-text: #bc8cff; 
             --highlight-blue: rgba(14, 165, 233, 0.15); --blue-text: #38bdf8;
             --highlight-pink: rgba(219, 39, 119, 0.15); --pink-text: #f472b6;
+            --highlight-green: rgba(34, 197, 94, 0.15); --green-text: #4ade80;
             --shadow: 0 3px 6px rgba(0,0,0,0.4);
         }
 
@@ -89,7 +91,6 @@
         .interpretation-box p { margin: 5px 0; }
         .norm-table-info { font-size: 12px; color: var(--text-muted); background: var(--bg-panel); padding: 8px; border-radius: 4px; border: 1px dashed var(--border); margin-top: 10px; display: inline-block;}
 
-        /* Yeni: Kaynakça / Footer Tasarımı */
         .reference-footer { margin-top: 40px; padding-top: 15px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 
         .print-only { display: none; }
@@ -99,8 +100,8 @@
             @page { size: A4 landscape; margin: 0.5cm; }
             :root { 
                 --bg-body: #fff; --bg-panel: #fff; --text-main: #000; --border: #000; --secondary: #fff; 
-                --highlight-yellow: #fff; --highlight-purple: #fff; --highlight-blue: #fff; --highlight-pink: #fff;
-                --blue-text: #000; --pink-text: #000; --purple-text: #000; --warning: #000; --danger: #000; --success: #000;
+                --highlight-yellow: #fff; --highlight-purple: #fff; --highlight-blue: #fff; --highlight-pink: #fff; --highlight-green: #fff;
+                --blue-text: #000; --pink-text: #000; --purple-text: #000; --green-text: #000; --warning: #000; --danger: #000; --success: #000;
             }
             body { background: white; padding: 0; color: black; font-size: 11px; }
             .container { box-shadow: none; border: none; padding: 0; margin: 0; max-width: 100%; width: 100%; }
@@ -173,13 +174,15 @@
                     <th rowspan="2" style="background:var(--highlight-yellow); width:50px;">
                         <span class="print-text">USB</span><button class="btn-start no-print" style="color:var(--warning);" onclick="startTrial('USB')">USB</button>
                     </th>
+                    <th rowspan="2" style="background:var(--highlight-purple); width:50px;">
+                        <span class="print-text">Tanıma(USB)</span><button class="btn-start no-print" style="color:var(--purple-text);" onclick="startTrial('TANIMA')">Tanıma</button>
+                    </th>
                     <th rowspan="2" style="background:var(--highlight-pink); width:60px;">
                         <span class="print-text">45 Kelime</span><button class="btn-start no-print" style="background:transparent; border-color:var(--pink-text); color:var(--pink-text);" onclick="startTrial('TOPLU_TANIMA')">45 Kelime</button>
                     </th>
-                    <th rowspan="2" style="background:var(--highlight-purple); width:50px;">
-                        <span class="print-text">Tanıma(3lü)</span><button class="btn-start no-print" style="color:var(--purple-text);" onclick="startTrial('TANIMA')">Tanıma</button>
+                    <th rowspan="2" style="background:var(--highlight-green); width:50px;">
+                        <span class="print-text">Z. Seçme</span><button class="btn-start no-print" style="background:transparent; border-color:var(--green-text); color:var(--green-text);" onclick="startTrial('ZORUNLU_SECME')">Z. Seçme</button>
                     </th>
-
                 </tr>
                 <tr id="tableHeaders"></tr>
             </thead>
@@ -198,11 +201,10 @@
         <div class="result-card" style="border-top: 3px solid var(--warning);">USB: <span class="val" id="resUSB" style="color:var(--warning);">0</span></div>
         <div class="result-card" style="border-top: 3px solid var(--pink-text);">Serbest Doğru: <span class="val" id="resTopluT" style="color:var(--pink-text);">0</span></div>
         <div class="result-card" style="border-top: 3px solid var(--danger);">Serbest Yanlış: <span class="val" id="resTopluY" style="color:var(--danger);">0</span></div>
-        <div class="result-card" style="border-top: 3px solid var(--purple-text);">Tanıma(3lü) (+T): <span class="val" id="resTanima" style="color:var(--purple-text);">0</span></div>
-        <div class="result-card" style="border-top: 3px solid var(--danger);">Tanıma(3lü) (-Y): <span class="val" id="resYanlisTanima" style="color:var(--danger);">0</span></div>
+        <div class="result-card" style="border-top: 3px solid var(--purple-text);">Nihai Tanıma (+T): <span class="val" id="resTanima" style="color:var(--purple-text);">0</span></div>
+        <div class="result-card" style="border-top: 3px solid var(--danger);">Nihai Tanıma (-Y): <span class="val" id="resYanlisTanima" style="color:var(--danger);">0</span></div>
     </div>
 
-    <!-- YENİ YORUMLAMA MODÜLÜ -->
     <h3 style="margin-top: 30px; font-size: 16px;">Otomatik Klinik Yorumlama (El Kitabı Normlarına Göre)</h3>
     <div class="interpretation-box" id="interpretationBox">
         <div id="interpretationText" style="color:var(--text-muted); font-style:italic;">Değerlendirme için testin tamamlanması ve hasta Yaş/Eğitim bilgisinin girilmesi bekleniyor...</div>
@@ -212,7 +214,6 @@
         <button class="btn-large" style="display:inline-flex; width: auto; background:var(--secondary); color:var(--text-main);" onclick="preparePrint()">🖨️ PDF / Yazdır</button>
     </div>
 
-    <!-- YENİ: KAYNAKÇA BÖLÜMÜ -->
     <div class="reference-footer">
         <b>Kaynakça & Bildirim:</b> Bu klinik asistan uygulaması, Prof. Dr. Öget Öktem Tanör tarafından geliştirilen <i>Öktem Sözel Bellek Süreçleri Testi (Öktem-SBST)</i> baz alınarak tasarlanmıştır. Test normları ve klinik hesaplama algoritmaları, <b>Türk Psikologlar Derneği Yayınları (2011) Öktem-SBST El Kitabı</b> referans alınarak kurgulanmıştır. Tüm bilimsel telif ve entelektüel haklar asıl eser sahiplerine aittir.
     </div>
@@ -248,10 +249,12 @@
         "BURUN": 10, "HİNDİ": 11, "RENK": 12, "EV": 13, "NEHİR": 14
     };
     const targetWordsKeys = Object.keys(targetWordToIdx);
-    const all45Words = triplets.flat().sort((a,b)=>a.localeCompare(b,'tr')); 
     
-    let testData = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{} };
-    let intrusions = { 1:"", 2:"", 3:"", 4:"", 5:"", 6:"", 7:"", 8:"", 9:"", 10:"", "H":"", "USB":"", "TOPLU_TANIMA":"" };
+    // YENİ: 45 Kelime Testi El Kitabındaki gibi gruplar bozulmadan dizilecek (alfabetik sıralama iptal edildi).
+    const all45Words = triplets.flat(); 
+    
+    let testData = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{}, "ZORUNLU_SECME":{} };
+    let intrusions = { 1:"", 2:"", 3:"", 4:"", 5:"", 6:"", 7:"", 8:"", 9:"", 10:"", "H":"", "USB":"", "TOPLU_TANIMA":"", "ZORUNLU_SECME":"" };
     let activeKey = null, clickOrder = 1, history = [];
 
     window.onload = () => {
@@ -266,15 +269,16 @@
             intRow.innerHTML += `<td id="int-${i}"></td>`;
         }
         
-        intRow.innerHTML += `<td id="int-H" style="background:var(--highlight-blue);"></td><td id="int-USB" style="background:var(--highlight-yellow);"></td><td id="int-TOPLU_TANIMA" style="background:var(--highlight-pink); color:var(--danger); font-size:10px; font-style:italic;" title="Serbest tanımadaki yanlışlar (çeldiriciler) burada listelenir."></td><td id="int-TANIMA" style="background:var(--highlight-purple);"></td>`;
+        intRow.innerHTML += `<td id="int-H" style="background:var(--highlight-blue);"></td><td id="int-USB" style="background:var(--highlight-yellow);"></td><td id="int-TANIMA" style="background:var(--highlight-purple);"></td><td id="int-TOPLU_TANIMA" style="background:var(--highlight-pink); color:var(--danger); font-size:10px; font-style:italic;" title="Serbest tanımadaki yanlışlar"></td><td id="int-ZORUNLU_SECME" style="background:var(--highlight-green);"></td>`;
 
         words.forEach((w, idx) => {
             let r = `<tr><td class="word-cell">${w.k}</td>`;
             for(let i=1; i<=10; i++) r += `<td id="c-${i}-${idx}"></td>`;
             r += `<td id="c-H-${idx}" style="background:var(--highlight-blue); font-weight:bold; color:var(--blue-text); text-align:center;"></td>`;
             r += `<td id="c-USB-${idx}" style="background:var(--highlight-yellow);"></td>`;
+            r += `<td id="c-TANIMA-${idx}" style="background:var(--highlight-purple); font-weight:bold; text-align:center;"></td>`;
             r += `<td id="c-TOPLU_TANIMA-${idx}" style="background:var(--highlight-pink); font-weight:bold; text-align:center;"></td>`;
-            r += `<td id="c-TANIMA-${idx}" style="background:var(--highlight-purple); font-weight:bold; text-align:center;"></td></tr>`;
+            r += `<td id="c-ZORUNLU_SECME-${idx}" style="background:var(--highlight-green); font-weight:bold; color:var(--green-text); text-align:center;"></td></tr>`;
             tbody.innerHTML += r;
         });
 
@@ -322,11 +326,12 @@
                 document.getElementById('pDate').value = draft.pDate || getTodayString();
                 document.getElementById('digitSpan').value = draft.digitSpan || "";
                 
-                testData = draft.testData || { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{} };
-                intrusions = draft.intrusions || { 1:"", 2:"", 3:"", 4:"", 5:"", 6:"", 7:"", 8:"", 9:"", 10:"", "H":"", "USB":"", "TOPLU_TANIMA":"" };
+                testData = draft.testData || { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{}, "ZORUNLU_SECME":{} };
+                intrusions = draft.intrusions || { 1:"", 2:"", 3:"", 4:"", 5:"", 6:"", 7:"", 8:"", 9:"", 10:"", "H":"", "USB":"", "TOPLU_TANIMA":"", "ZORUNLU_SECME":"" };
                 
                 if(!testData['H']) testData['H'] = {};
                 if(!testData['TOPLU_TANIMA']) testData['TOPLU_TANIMA'] = {};
+                if(!testData['ZORUNLU_SECME']) testData['ZORUNLU_SECME'] = {};
 
                 updateUIFromData();
             } catch(e) {
@@ -356,8 +361,8 @@
         document.getElementById('pDate').value = getTodayString();
         document.getElementById('assessorName').value = localStorage.getItem('sbstAssessor') || "";
 
-        testData = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{} };
-        intrusions = { 1:"", 2:"", 3:"", 4:"", 5:"", 6:"", 7:"", 8:"", 9:"", 10:"", "H":"", "USB":"", "TOPLU_TANIMA":"" };
+        testData = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{}, "ZORUNLU_SECME":{} };
+        intrusions = { 1:"", 2:"", 3:"", 4:"", 5:"", 6:"", 7:"", 8:"", 9:"", 10:"", "H":"", "USB":"", "TOPLU_TANIMA":"", "ZORUNLU_SECME":"" };
         updateUIFromData();
     }
 
@@ -368,9 +373,9 @@
         document.getElementById('intrusionInput').value = intrusions[key] || "";
         document.getElementById('undoBtn').style.display = 'block';
 
-        if(key === 'TANIMA') {
+        if (key === 'ZORUNLU_SECME') {
             document.getElementById('trialTitle').innerText = "Zorunlu Seçme (Üçlü Tanıma)";
-            document.getElementById('trialDesc').innerText = "45 Kelimelik testte 'yoktu' dediği veya yanlış tanıdığı ('vardı' dediği) kelimeler için zorunlu seçme. Hastaya okuyup hangisini söylediğini seçiniz.";
+            document.getElementById('trialDesc').innerText = "45 Kelimelik testte hata yapılan ('yoktu' denen veya çeldiriciye 'vardı' denen) kelimeler için zorunlu seçme.";
             document.getElementById('orderTrackerDiv').style.display = 'none'; document.getElementById('intrusionBox').style.display = 'none';
             grid.style.display = 'none'; tGrid.style.display = 'block';
             let added = false;
@@ -383,19 +388,42 @@
                 
                 if(!targetClicked || distractorClicked) { 
                     let h = `<div class="triplet-row"><div style="width:24px; font-weight:600; color:var(--text-muted);">${gI+1}.</div><div class="triplet-btns">`;
+                    g.forEach(w => h += `<button class="word-btn" style="flex:1" id="t-${gI}-${w}" onclick="handleZorunluSecmeClick(${gI},'${w}')">${w}</button>`);
+                    tGrid.innerHTML += h + `</div></div>`;
+                    added = true;
+                }
+            });
+            if(!added) { 
+                tGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; font-weight:bold; color:var(--success);">45 Kelimelik aşamada hiç hata yapılmadığı için Zorunlu Seçme aşamasına gerek yoktur.</div>`; 
+                document.getElementById('undoBtn').style.display = 'none'; 
+            }
+        }
+        else if(key === 'TANIMA') {
+            document.getElementById('trialTitle').innerText = "Tanıma (Üçlü Gruplar - USB Sonrası)";
+            document.getElementById('trialDesc').innerText = "SADECE USB'de hatırlanamayan kelimelerin üçlü grupları. Hastaya okuyup hangisini söylediğini seçiniz.";
+            document.getElementById('orderTrackerDiv').style.display = 'none'; document.getElementById('intrusionBox').style.display = 'none';
+            grid.style.display = 'none'; tGrid.style.display = 'block';
+            let added = false;
+            
+            triplets.forEach((g, gI) => {
+                let targetWord = g.find(w => targetWordsKeys.includes(w));
+                let wordIndex = targetWordToIdx[targetWord];
+                
+                if(!testData['USB'][wordIndex]) { 
+                    let h = `<div class="triplet-row"><div style="width:24px; font-weight:600; color:var(--text-muted);">${gI+1}.</div><div class="triplet-btns">`;
                     g.forEach(w => h += `<button class="word-btn" style="flex:1" id="t-${gI}-${w}" onclick="handleTanimaClick(${gI},'${w}')">${w}</button>`);
                     tGrid.innerHTML += h + `</div></div>`;
                     added = true;
                 }
             });
             if(!added) { 
-                tGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; font-weight:bold; color:var(--success);">45 Kelimelik Serbest Tanıma aşamasında hiçbir hata yapılmadığı için Zorunlu Seçme (Üçlü Tanıma) aşamasına gerek yoktur.</div>`; 
+                tGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; font-weight:bold; color:var(--success);">USB aşamasında tüm kelimeler hatırlandığı için tanıma aşamasına gerek yoktur.</div>`; 
                 document.getElementById('undoBtn').style.display = 'none'; 
             }
         } 
         else if (key === 'TOPLU_TANIMA') {
             document.getElementById('trialTitle').innerText = "Serbest Tanıma (45 Kelime)";
-            document.getElementById('trialDesc').innerText = "Hastaya 45 kelimeyi tek tek okuyun. 'Vardı' dediklerine tıklayın, 'Yoktu' dediklerini boş bırakın.";
+            document.getElementById('trialDesc').innerText = "Hastaya 45 kelimeyi aşağıdaki sırayla okuyun. 'Vardı' dediklerine tıklayın, 'Yoktu' dediklerini boş bırakın.";
             document.getElementById('orderTrackerDiv').style.display = 'none'; document.getElementById('intrusionBox').style.display = 'none';
             document.getElementById('undoBtn').style.display = 'none'; 
             grid.style.display = 'grid'; tGrid.style.display = 'none';
@@ -462,6 +490,12 @@
         else { testData['TANIMA'][gI]=w; document.getElementById(`t-${gI}-${w}`).classList.add('tanima-selected'); } 
     }
 
+    function handleZorunluSecmeClick(gI, w) { 
+        triplets[gI].forEach(x => document.getElementById(`t-${gI}-${x}`).classList.remove('tanima-selected')); 
+        if(testData['ZORUNLU_SECME'][gI]===w) delete testData['ZORUNLU_SECME'][gI]; 
+        else { testData['ZORUNLU_SECME'][gI]=w; document.getElementById(`t-${gI}-${w}`).classList.add('tanima-selected'); } 
+    }
+
     function handleTopluTanimaClick(w) {
         let btn = document.getElementById(`tt-${w}`);
         let isTarget = targetWordsKeys.includes(w);
@@ -476,7 +510,7 @@
     }
 
     function undoLastClick() { 
-        if(history.length && activeKey !== 'TANIMA' && activeKey !== 'TOPLU_TANIMA'){ 
+        if(history.length && activeKey !== 'TANIMA' && activeKey !== 'TOPLU_TANIMA' && activeKey !== 'ZORUNLU_SECME'){ 
             const l = history.pop(); delete testData[activeKey][l]; clickOrder--; 
             document.getElementById(`btn-${l}`).classList.remove('selected'); document.getElementById('currentOrderDisplay').innerText = clickOrder;
         } 
@@ -484,10 +518,11 @@
     
     function saveAndReturn() { 
         try {
-            if(activeKey !== 'TANIMA' && activeKey !== 'TOPLU_TANIMA') intrusions[activeKey] = document.getElementById('intrusionInput').value;
+            if(activeKey !== 'TANIMA' && activeKey !== 'TOPLU_TANIMA' && activeKey !== 'ZORUNLU_SECME') intrusions[activeKey] = document.getElementById('intrusionInput').value;
             
             if(activeKey) testData[activeKey]['_done'] = true;
 
+            // OTOMATİK İLERLEME (AKILLI KLİNİK AKIŞ)
             if(activeKey === 10) {
                 let missedCount = 0;
                 for(let i=0; i<15; i++) { if(!testData[10][i]) missedCount++; }
@@ -498,8 +533,23 @@
                 } else { testData['H']['_done'] = true; }
             }
             else if (activeKey === 'USB') {
+                let missedCount = 0;
+                for(let i=0; i<15; i++) { if(!testData['USB'][i]) missedCount++; }
+                if(missedCount > 0) {
+                    updateUIFromData(); saveToLocal(true); 
+                    alert("Bilgi: USB tamamlandı.\nŞimdi USB'de bilinemeyen kelimeler için 'Tanıma' aşamasına yönlendiriliyorsunuz.");
+                    startTrial('TANIMA'); return; 
+                } else { 
+                    testData['TANIMA']['_done'] = true; 
+                    // USB tamamsa bile 45'e geçilir
+                    updateUIFromData(); saveToLocal(true); 
+                    alert("Bilgi: USB kusursuz tamamlandı.\nKılavuz kuralı gereği şimdi '45 Kelimelik Serbest Tanıma' testine yönlendiriliyorsunuz.");
+                    startTrial('TOPLU_TANIMA'); return;
+                }
+            }
+            else if (activeKey === 'TANIMA') {
                 updateUIFromData(); saveToLocal(true); 
-                alert("Bilgi: USB (Gecikmeli Hatırlama) tamamlandı.\nKılavuz kuralı gereği şimdi zorunlu '45 Kelime (Serbest Tanıma)' testine yönlendiriliyorsunuz.");
+                alert("Bilgi: İlk Tanıma aşaması bitti.\nKılavuz kuralı gereği şimdi zorunlu '45 Kelime (Serbest Tanıma)' testine yönlendiriliyorsunuz.");
                 startTrial('TOPLU_TANIMA'); return; 
             }
             else if (activeKey === 'TOPLU_TANIMA') {
@@ -514,10 +564,10 @@
                 
                 if(needsZorunluSecme) {
                     updateUIFromData(); saveToLocal(true); 
-                    alert("Bilgi: 45 Kelime testi tamamlandı.\nHata yapılan/bilinemeyen kelimeler için 'Zorunlu Seçme (Üçlü Tanıma)' aşamasına yönlendiriliyorsunuz.");
-                    startTrial('TANIMA'); return; 
+                    alert("Bilgi: 45 Kelime testi tamamlandı.\nHata yapılan kelimeler için 'Zorunlu Seçme (Üçlü)' aşamasına yönlendiriliyorsunuz.");
+                    startTrial('ZORUNLU_SECME'); return; 
                 } else {
-                    testData['TANIMA']['_done'] = true; 
+                    testData['ZORUNLU_SECME']['_done'] = true; 
                 }
             }
             
@@ -536,6 +586,7 @@
             if(!testData['H']) testData['H'] = {};
             if(!testData['TANIMA']) testData['TANIMA'] = {};
             if(!testData['TOPLU_TANIMA']) testData['TOPLU_TANIMA'] = {};
+            if(!testData['ZORUNLU_SECME']) testData['ZORUNLU_SECME'] = {};
             if(!testData['USB']) testData['USB'] = {};
             if(!testData[10]) testData[10] = {};
 
@@ -575,6 +626,33 @@
                 }
             });
 
+            // İLK TANIMA SÜTUNU (USB Sonrası)
+            words.forEach((w, i) => {
+                let t = targetWordsKeys.find(key => targetWordToIdx[key] === i);
+                if(!t) return;
+                let gI = triplets.findIndex(g => g.includes(t)); 
+                let sel = testData['TANIMA'][gI];
+                let cell = document.getElementById(`c-TANIMA-${i}`); 
+                if(!cell) return;
+                
+                if (testData['TANIMA']['_done']) {
+                    if (!testData['USB'][i]) { 
+                        cell.innerText = sel === t ? "+T" : "-Y"; 
+                        cell.style.color = sel === t ? "var(--success)" : "var(--danger)";
+                    } else {
+                        cell.innerText = ""; 
+                    }
+                } else {
+                    if (sel) {
+                        cell.innerText = sel === t ? "+T" : "-Y";
+                        cell.style.color = sel === t ? "var(--success)" : "var(--danger)";
+                    } else {
+                        cell.innerText = "";
+                    }
+                }
+            });
+
+            // 45 KELİME SÜTUNU (Serbest Tanıma - KATI KURAL)
             let topluFalsePositives = [];
             words.forEach((w, i) => {
                 let t = targetWordsKeys.find(key => targetWordToIdx[key] === i);
@@ -582,6 +660,7 @@
                 let g = triplets.find(group => group.includes(t));
                 
                 let targetClicked = !!testData['TOPLU_TANIMA'][t];
+                // KURAL: Gruptaki herhangi bir çeldiriciye tıklanmışsa doğruyu da sıfırla.
                 let distractorClicked = g.some(word => word !== t && testData['TOPLU_TANIMA'][word]);
                 
                 let cellToplu = document.getElementById(`c-TOPLU_TANIMA-${i}`);
@@ -607,26 +686,26 @@
             let intTopluEl = document.getElementById('int-TOPLU_TANIMA');
             if(intTopluEl) intTopluEl.innerText = topluFalsePositives.join(', ');
 
+            // ZORUNLU SEÇME SÜTUNU (45 Kelime Sonrası)
             words.forEach((w, i) => {
                 let t = targetWordsKeys.find(key => targetWordToIdx[key] === i);
                 if(!t) return;
                 let gI = triplets.findIndex(g => g.includes(t)); 
                 let g = triplets[gI];
-                let sel = testData['TANIMA'][gI];
-                let cell = document.getElementById(`c-TANIMA-${i}`); 
+                let sel = testData['ZORUNLU_SECME'][gI];
+                let cell = document.getElementById(`c-ZORUNLU_SECME-${i}`); 
                 if(!cell) return;
                 
                 let targetClicked = !!testData['TOPLU_TANIMA'][t];
                 let distractorClicked = g.some(word => word !== t && testData['TOPLU_TANIMA'][word]);
-                let requiresTanima = (!targetClicked || distractorClicked) && testData['TOPLU_TANIMA']['_done'];
+                let requiresZorunluSecme = (!targetClicked || distractorClicked) && testData['TOPLU_TANIMA']['_done'];
 
-                if (testData['TANIMA']['_done']) {
-                    if (!requiresTanima && testData['TOPLU_TANIMA']['_done']) { 
-                        cell.innerText = "+T"; 
-                        cell.style.color = "var(--success)";
-                    } else {
+                if (testData['ZORUNLU_SECME']['_done']) {
+                    if (requiresZorunluSecme) { 
                         cell.innerText = sel === t ? "+T" : "-Y"; 
                         cell.style.color = sel === t ? "var(--success)" : "var(--danger)";
+                    } else {
+                        cell.innerText = ""; 
                     }
                 } else {
                     if (sel) {
@@ -663,17 +742,14 @@
             let usbCount = testData['USB'] ? Object.keys(testData['USB']).filter(k => k !== '_done').length : 0;
             document.getElementById('resUSB').innerText = usbCount;
             
-            let okToplu = 0;
-            let errToplu = 0;
+            let okToplu = 0, errToplu = 0;
             
             triplets.forEach((g) => {
                 let t = g.find(w => targetWordsKeys.includes(w));
                 let targetClicked = !!testData['TOPLU_TANIMA'][t];
                 let distractorClicked = g.some(w => w !== t && testData['TOPLU_TANIMA'][w]);
                 
-                if (targetClicked && !distractorClicked) {
-                    okToplu++; 
-                }
+                if (targetClicked && !distractorClicked) okToplu++; 
             });
             
             if(testData['TOPLU_TANIMA']) {
@@ -685,21 +761,32 @@
             document.getElementById('resTopluT').innerText = okToplu;
             document.getElementById('resTopluY').innerText = errToplu;
 
+            // NİHAİ TANIMA PUANI (Klinik Yorumlamada Kullanılan Asıl Puan)
+            // Hasta bir kelimeyi USB'de, İlk Tanıma'da, 45'li Testte veya Zorunlu Seçme'de bulduysa +T alır.
             let ok = 0, err = 0; 
-            triplets.forEach((g, gI) => {
-                let t = g.find(w => targetWordsKeys.includes(w));
-                let targetClicked = !!testData['TOPLU_TANIMA'][t];
-                let distractorClicked = g.some(w => w !== t && testData['TOPLU_TANIMA'][w]);
-                let requiresTanima = (!targetClicked || distractorClicked) && testData['TOPLU_TANIMA']['_done'];
+            words.forEach((w, i) => {
+                let t = targetWordsKeys.find(key => targetWordToIdx[key] === i);
+                if(!t) return;
+                let gI = triplets.findIndex(g => g.includes(t));
+                let g = triplets[gI];
+
+                let knownInUSB = testData['USB'] && testData['USB'][i] !== undefined;
+                let knownInTanima1 = testData['TANIMA'] && testData['TANIMA'][gI] === t;
                 
-                if (!requiresTanima && testData['TOPLU_TANIMA']['_done']) {
+                let targetClicked = testData['TOPLU_TANIMA'] && !!testData['TOPLU_TANIMA'][t];
+                let distractorClicked = testData['TOPLU_TANIMA'] && g.some(word => word !== t && testData['TOPLU_TANIMA'][word]);
+                let knownIn45 = targetClicked && !distractorClicked;
+                
+                let knownInZS = testData['ZORUNLU_SECME'] && testData['ZORUNLU_SECME'][gI] === t;
+                
+                if (knownInUSB || knownInTanima1 || knownIn45 || knownInZS) {
                     ok++; 
                 } else {
-                    let sel = testData['TANIMA'] ? testData['TANIMA'][gI] : undefined;
-                    if(sel === t) { ok++; } 
-                    else if (sel || (testData['TANIMA'] && testData['TANIMA']['_done'])) { err++; } 
+                    // Eğer tüm aşamalar tamamlandıysa ve hiçbirinde bulamadıysa Hata'dır.
+                    if (testData['ZORUNLU_SECME'] && testData['ZORUNLU_SECME']['_done']) err++;
                 }
             });
+
             document.getElementById('resTanima').innerText = ok; 
             document.getElementById('resYanlisTanima').innerText = err;
             
@@ -740,9 +827,8 @@
         let eduInput = document.getElementById('pEdu').value;
         let interpretationText = "";
 
-        let isTestFinished = (testData['USB'] && testData['USB']['_done']) || 
-                             (testData['TANIMA'] && testData['TANIMA']['_done']) || 
-                             (testData['TOPLU_TANIMA'] && testData['TOPLU_TANIMA']['_done']);
+        // Yorumlama artık en son aşama olan Zorunlu Seçme'ye kadar bitmişse tetiklenir
+        let isTestFinished = (testData['ZORUNLU_SECME'] && testData['ZORUNLU_SECME']['_done']) || (testData['USB'] && testData['USB']['_done'] && Object.keys(testData['USB']).length -1 === 15); // Full çektiyse ve bittiyse
 
         if (ageInput && eduInput && isTestFinished) {
             let age = parseInt(ageInput);
@@ -774,13 +860,13 @@
                     interpretationText += `<p style="color:var(--danger)">💡 <b>Nörobilişsel Profil:</b> Hem serbest hatırlama hem de ipuçlu Tanıma (${recognitionScore}/15) performansı düşüktür. Bu tablo; yeni bilginin kalıcı belleğe aktarılamadığı birincil <b>'kayıt/depolama' (storage) kusurunu</b> düşündürmektedir (Örn: Alzheimer Tipi amnezik sendromlar).</p>`;
                 }
             } else if (totalLearning >= expectedTotal) {
-                interpretationText += `<p style="color:var(--success)">💡 <b>Nörobilişsel Profil:</b> Hastanın genel sözel bellek (kayıt, depolama ve geri çağırma) fonksiyonları yaş ve eğitim normlarına göre <b>olağan (normal)</b> olarak değerlendirilmiştir.</p>`;
+                interpretationText += `<p style="color:var(--success)">💡 <b>Nörobilişsel Profil:</b> Hastanın genel sözel bellek (kayıt, depolama ve geri çağrılma) fonksiyonları yaş ve eğitim normlarına göre <b>olağan (normal)</b> olarak değerlendirilmiştir.</p>`;
             }
 
             interpretationText += `<hr style="margin:15px 0; border:0; border-top:1px dashed var(--border);"><p style="font-size:11px; color:var(--text-muted);"><i>Not: Bu otomatik bir ön değerlendirmedir. Kesin klinik tanı, hastanın klinik öyküsü ve diğer nöropsikolojik bataryalarla birlikte değerlendirilmelidir.</i></p>`;
 
         } else {
-            interpretationText = "<p style='color:var(--text-muted); font-style:italic;'>Otomatik yorumlama profilinin oluşturulabilmesi için testin USB veya Tanıma aşamasının kaydedilmesi ve hastanın Yaş/Eğitim bilgilerinin girilmesi gereklidir.</p>";
+            interpretationText = "<p style='color:var(--text-muted); font-style:italic;'>Otomatik yorumlama profilinin oluşturulabilmesi için testin tüm aşamalarının (Zorunlu Seçme dahil) kaydedilmesi ve hastanın Yaş/Eğitim bilgilerinin girilmesi gereklidir.</p>";
         }
 
         document.getElementById('interpretationText').innerHTML = interpretationText;
