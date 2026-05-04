@@ -62,7 +62,7 @@
         .btn-back { background: transparent; color: var(--text-muted); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 15px; display: inline-flex; gap: 5px; }
         
         .word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .word-btn { position: relative; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); padding: 18px 5px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; min-height: 70px; transition: 0.15s; }
+        .word-btn { position: relative; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); padding: 14px 4px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; min-height: 65px; transition: 0.15s; word-wrap: break-word; line-height: 1.2;}
         .word-btn.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
         .word-btn.tanima-selected { background: var(--highlight-purple); color: var(--purple-text); border-color: var(--purple-text); box-shadow: inset 0 0 0 2px var(--purple-text); }
         
@@ -92,6 +92,11 @@
         .norm-table-info { font-size: 12px; color: var(--text-muted); background: var(--bg-panel); padding: 8px; border-radius: 4px; border: 1px dashed var(--border); margin-top: 10px; display: inline-block;}
 
         .reference-footer { margin-top: 40px; padding-top: 15px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+        /* Mobil Ekranlar İçin 3'lü Görünüm Ayarlamaları */
+        @media (max-width: 500px) {
+            .word-btn { font-size: 12px; padding: 10px 2px; min-height: 55px; }
+        }
 
         .print-only { display: none; }
         .print-text { display: none; }
@@ -250,7 +255,6 @@
     };
     const targetWordsKeys = Object.keys(targetWordToIdx);
     
-    // YENİ: 45 Kelime Testi El Kitabındaki gibi gruplar bozulmadan dizilecek (alfabetik sıralama iptal edildi).
     const all45Words = triplets.flat(); 
     
     let testData = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{}, "ZORUNLU_SECME":{} };
@@ -372,6 +376,9 @@
         grid.innerHTML = ''; tGrid.innerHTML = ''; document.getElementById('intrusionBox').style.display = 'block';
         document.getElementById('intrusionInput').value = intrusions[key] || "";
         document.getElementById('undoBtn').style.display = 'block';
+        
+        // Varsayılan Grid Düzenini Temizle
+        grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(130px, 1fr))'; 
 
         if (key === 'ZORUNLU_SECME') {
             document.getElementById('trialTitle').innerText = "Zorunlu Seçme (Üçlü Tanıma)";
@@ -427,6 +434,9 @@
             document.getElementById('orderTrackerDiv').style.display = 'none'; document.getElementById('intrusionBox').style.display = 'none';
             document.getElementById('undoBtn').style.display = 'none'; 
             grid.style.display = 'grid'; tGrid.style.display = 'none';
+            
+            // DÜZELTME: Ekran boyutu ne olursa olsun 45 kelimelik testi daima 3'lü dizilimde göster.
+            grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
             
             all45Words.forEach(w => {
                 let isSel = testData['TOPLU_TANIMA'][w];
@@ -522,7 +532,6 @@
             
             if(activeKey) testData[activeKey]['_done'] = true;
 
-            // OTOMATİK İLERLEME (AKILLI KLİNİK AKIŞ)
             if(activeKey === 10) {
                 let missedCount = 0;
                 for(let i=0; i<15; i++) { if(!testData[10][i]) missedCount++; }
@@ -541,7 +550,6 @@
                     startTrial('TANIMA'); return; 
                 } else { 
                     testData['TANIMA']['_done'] = true; 
-                    // USB tamamsa bile 45'e geçilir
                     updateUIFromData(); saveToLocal(true); 
                     alert("Bilgi: USB kusursuz tamamlandı.\nKılavuz kuralı gereği şimdi '45 Kelimelik Serbest Tanıma' testine yönlendiriliyorsunuz.");
                     startTrial('TOPLU_TANIMA'); return;
@@ -626,7 +634,6 @@
                 }
             });
 
-            // İLK TANIMA SÜTUNU (USB Sonrası)
             words.forEach((w, i) => {
                 let t = targetWordsKeys.find(key => targetWordToIdx[key] === i);
                 if(!t) return;
@@ -652,7 +659,6 @@
                 }
             });
 
-            // 45 KELİME SÜTUNU (Serbest Tanıma - KATI KURAL)
             let topluFalsePositives = [];
             words.forEach((w, i) => {
                 let t = targetWordsKeys.find(key => targetWordToIdx[key] === i);
@@ -660,7 +666,6 @@
                 let g = triplets.find(group => group.includes(t));
                 
                 let targetClicked = !!testData['TOPLU_TANIMA'][t];
-                // KURAL: Gruptaki herhangi bir çeldiriciye tıklanmışsa doğruyu da sıfırla.
                 let distractorClicked = g.some(word => word !== t && testData['TOPLU_TANIMA'][word]);
                 
                 let cellToplu = document.getElementById(`c-TOPLU_TANIMA-${i}`);
@@ -686,7 +691,6 @@
             let intTopluEl = document.getElementById('int-TOPLU_TANIMA');
             if(intTopluEl) intTopluEl.innerText = topluFalsePositives.join(', ');
 
-            // ZORUNLU SEÇME SÜTUNU (45 Kelime Sonrası)
             words.forEach((w, i) => {
                 let t = targetWordsKeys.find(key => targetWordToIdx[key] === i);
                 if(!t) return;
@@ -761,8 +765,6 @@
             document.getElementById('resTopluT').innerText = okToplu;
             document.getElementById('resTopluY').innerText = errToplu;
 
-            // NİHAİ TANIMA PUANI (Klinik Yorumlamada Kullanılan Asıl Puan)
-            // Hasta bir kelimeyi USB'de, İlk Tanıma'da, 45'li Testte veya Zorunlu Seçme'de bulduysa +T alır.
             let ok = 0, err = 0; 
             words.forEach((w, i) => {
                 let t = targetWordsKeys.find(key => targetWordToIdx[key] === i);
@@ -782,7 +784,6 @@
                 if (knownInUSB || knownInTanima1 || knownIn45 || knownInZS) {
                     ok++; 
                 } else {
-                    // Eğer tüm aşamalar tamamlandıysa ve hiçbirinde bulamadıysa Hata'dır.
                     if (testData['ZORUNLU_SECME'] && testData['ZORUNLU_SECME']['_done']) err++;
                 }
             });
@@ -827,8 +828,7 @@
         let eduInput = document.getElementById('pEdu').value;
         let interpretationText = "";
 
-        // Yorumlama artık en son aşama olan Zorunlu Seçme'ye kadar bitmişse tetiklenir
-        let isTestFinished = (testData['ZORUNLU_SECME'] && testData['ZORUNLU_SECME']['_done']) || (testData['USB'] && testData['USB']['_done'] && Object.keys(testData['USB']).length -1 === 15); // Full çektiyse ve bittiyse
+        let isTestFinished = (testData['ZORUNLU_SECME'] && testData['ZORUNLU_SECME']['_done']) || (testData['USB'] && testData['USB']['_done'] && Object.keys(testData['USB']).length -1 === 15); 
 
         if (ageInput && eduInput && isTestFinished) {
             let age = parseInt(ageInput);
