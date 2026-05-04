@@ -66,7 +66,7 @@
         .word-btn.tt-correct { background-color: var(--success) !important; color: white !important; border-color: var(--success) !important; box-shadow: 0 4px 10px rgba(45, 164, 78, 0.3); }
         .word-btn.tt-wrong { background-color: var(--danger) !important; color: white !important; border-color: var(--danger) !important; box-shadow: 0 4px 10px rgba(207, 34, 46, 0.3); }
 
-        /* Yeni: Saydam Orijinal Sıra Numarası (Filigran) */
+        /* Orijinal Sıra Numarası (Filigran) */
         .orig-order { position: absolute; top: 4px; left: 6px; font-size: 11px; opacity: 0.35; font-weight: 700; color: inherit; }
         .word-btn.selected .orig-order { color: #fff; opacity: 0.6; }
 
@@ -123,7 +123,7 @@
         <h2 style="font-size: 20px;">Klinik Kayıt Paneli (Yerel Mod)</h2>
         <div class="cloud-actions">
             <button class="btn-cloud new-test" onclick="handleNewTest()">➕ Yeni</button>
-            <button class="btn-cloud save" onclick="saveToLocal(false)">💾 Kaydet</button>
+            <button class="btn-cloud save" onclick="saveToLocal(false)">💾 Cihaza Kaydet</button>
             <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌗 Tema</button>
         </div>
     </div>
@@ -336,10 +336,15 @@
             document.getElementById('orderTrackerDiv').style.display = 'none'; document.getElementById('intrusionBox').style.display = 'none';
             grid.style.display = 'none'; tGrid.style.display = 'block';
             let added = false;
-            triplets.forEach((g, i) => {
-                if(!testData['USB'][i]) { // YALNIZCA USB'DE BİLİNMEYENLERİ GÖSTER
-                    let h = `<div class="triplet-row"><div style="width:24px; font-weight:600; color:var(--text-muted);">${i+1}.</div><div class="triplet-btns">`;
-                    g.forEach(w => h += `<button class="word-btn" style="flex:1" id="t-${i}-${w}" onclick="handleTanimaClick(${i},'${w}')">${w}</button>`);
+            
+            // DÜZELTİLEN KISIM: İndeks kontrolü artık doğru hedef kelimenin indeksine (wordIndex) göre yapılıyor.
+            triplets.forEach((g, gI) => {
+                let targetWord = g.find(w => targetWordsUpper.includes(w));
+                let wordIndex = targetWordsUpper.indexOf(targetWord);
+                
+                if(!testData['USB'][wordIndex]) { // YALNIZCA USB'DE BİLİNMEYENLERİ GÖSTER
+                    let h = `<div class="triplet-row"><div style="width:24px; font-weight:600; color:var(--text-muted);">${gI+1}.</div><div class="triplet-btns">`;
+                    g.forEach(w => h += `<button class="word-btn" style="flex:1" id="t-${gI}-${w}" onclick="handleTanimaClick(${gI},'${w}')">${w}</button>`);
                     tGrid.innerHTML += h + `</div></div>`;
                     added = true;
                 }
@@ -437,7 +442,6 @@
     function saveAndReturn() { 
         if(activeKey !== 'TANIMA' && activeKey !== 'TOPLU_TANIMA') intrusions[activeKey] = document.getElementById('intrusionInput').value;
         
-        // D10 -> EKSİK VARSA OTOMATİK HATIRLATMAYA GEÇ
         if(activeKey === 10) {
             let missedCount = 0;
             for(let i=0; i<15; i++) { if(!testData[10][i]) missedCount++; }
@@ -448,7 +452,6 @@
                 return;
             }
         }
-        // USB -> EKSİK VARSA OTOMATİK TANIMAYA GEÇ
         else if (activeKey === 'USB') {
             let missedCount = 0;
             for(let i=0; i<15; i++) { if(!testData['USB'][i]) missedCount++; }
@@ -480,15 +483,9 @@
             let t = targetWordsUpper[i]; let gI = triplets.findIndex(g => g.includes(t)); let sel = testData['TANIMA'][gI];
             let cell = document.getElementById(`c-TANIMA-${i}`); 
             
-            // Eğer USB'de kendiliğinden hatırlanmışsa, SBST kuralı gereği Tanınmış (+T) sayılır.
-            let isKnownInUSB = testData['USB'][i] !== undefined;
-            if(isKnownInUSB) {
-                cell.innerText = "+T";
-                cell.style.color = "var(--success)";
-            } else {
-                cell.innerText = sel===t ? "+T" : (sel ? "-Y" : ""); 
-                cell.style.color = sel===t ? "var(--success)" : "var(--danger)";
-            }
+            // DÜZELTİLEN KISIM: Artık Tanıma sütunu USB'yi kopyalamıyor. Sadece Tanıma ekranında seçilenleri gösteriyor.
+            cell.innerText = sel===t ? "+T" : (sel ? "-Y" : ""); 
+            cell.style.color = sel===t ? "var(--success)" : "var(--danger)";
         });
 
         let topluFalsePositives = [];
@@ -517,7 +514,7 @@
         words.forEach((w, i) => {
             let isKnownInUSB = testData['USB'][i] !== undefined;
             if(isKnownInUSB) {
-                ok++; // USB'de bilinen kelime otomatik olarak Tanımada doğru kabul edilir
+                ok++; // DÜZELTME KORUNDU: USB'de bilinen kelime puan olarak (+) sayılmaya devam eder.
             } else {
                 let t = targetWordsUpper[i]; let gI = triplets.findIndex(g => g.includes(t));
                 let sel = testData['TANIMA'][gI];
