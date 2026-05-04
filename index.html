@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Öktem-SBST Klinik Asistan</title>
     <style>
-        /* GitHub Stili Renk Paleti */
+        /* Renk Paleti */
         :root[data-theme="light"] {
             --bg-body: #f6f8fa; --bg-panel: #ffffff; --text-main: #24292f; --text-muted: #57606a;
             --border: #d0d7de; --primary: #0969da; --secondary: #f3f4f6; --secondary-hover: #ebecf0;
@@ -33,20 +33,18 @@
         .theme-toggle, .btn-cloud { border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
         .theme-toggle { background: var(--secondary); color: var(--text-main); }
         .btn-cloud.save { background: #0550ae; color: white; border-color: #0550ae; }
-        .btn-cloud.load { background: #2da44e; color: white; border-color: #2da44e; }
         .btn-cloud.new-test { background: var(--secondary); color: var(--primary); border-color: var(--border); }
 
         .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .input-group { display: flex; flex-direction: column; }
         .input-group label { font-weight: 600; margin-bottom: 6px; font-size: 12px; }
-        .input-group input, .input-group select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--bg-body); color: var(--text-main); outline: none;}
+        .input-group input, .input-group select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--bg-body); color: var(--text-main); outline: none; transition: 0.2s; }
         
         input[readonly] { background-color: var(--secondary); cursor: not-allowed; border-color: transparent; }
         .uid-input { font-family: monospace; font-weight: 600; color: var(--primary); }
         .sira-input { font-size: 16px; font-weight: bold; color: var(--success); text-align: center; }
 
         .alert { background: rgba(207, 34, 46, 0.1); color: var(--danger); padding: 12px; border-radius: 6px; font-weight: 600; display: none; margin-top: 10px; border: 1px solid rgba(207, 34, 46, 0.4); }
-        .info-bar { background: var(--secondary); padding: 10px; border-radius: 6px; font-size: 12px; color: var(--text-muted); margin-bottom: 15px; display: none; border: 1px dashed var(--border); }
 
         .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; border: 1px solid var(--border); border-radius: 6px; }
         table { width: 100%; border-collapse: collapse; text-align: center; border-style: hidden; }
@@ -65,7 +63,6 @@
         .word-btn.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
         .word-btn.tanima-selected { background: var(--highlight-purple); color: var(--purple-text); border-color: var(--purple-text); box-shadow: inset 0 0 0 2px var(--purple-text); }
         
-        /* 45 Kelime (Toplu Tanıma) Özel Renkleri */
         .word-btn.tt-correct { background-color: var(--success) !important; color: white !important; border-color: var(--success) !important; box-shadow: 0 4px 10px rgba(45, 164, 78, 0.3); }
         .word-btn.tt-wrong { background-color: var(--danger) !important; color: white !important; border-color: var(--danger) !important; box-shadow: 0 4px 10px rgba(207, 34, 46, 0.3); }
 
@@ -84,18 +81,6 @@
         .triplet-row { display: flex; gap: 10px; margin-bottom: 12px; padding: 12px; background: var(--secondary); border-radius: 6px; border: 1px solid var(--border); align-items: center; }
         .triplet-btns { display: flex; flex: 1; gap: 10px; }
 
-        #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; color: white; font-size: 20px; font-weight: bold; flex-direction: column; gap: 15px;}
-        .spinner { border: 4px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 4px solid #fff; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* Kayıt Modal */
-        #listModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--bg-panel); color: var(--text-main); width: 90%; max-width: 600px; max-height: 80vh; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; }
-        .record-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
-        .record-item { background: var(--secondary); padding: 15px; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.15s; }
-        .record-item:hover { border-color: var(--primary); box-shadow: inset 4px 0 0 var(--primary); }
-
         .print-only { display: none; }
         .print-text { display: none; }
         
@@ -104,7 +89,7 @@
             :root { --bg-body: #fff; --bg-panel: #fff; --text-main: #000; --border: #000; --secondary: #fff; --highlight-yellow: #fff; --highlight-purple: #fff;}
             body { background: white; padding: 0; color: black; font-size: 11px; }
             .container { box-shadow: none; border: none; padding: 0; margin: 0; max-width: 100%; width: 100%; }
-            .no-print, .btn-start, .action-bars, button, .theme-toggle, .cloud-actions, .settings-bar { display: none !important; }
+            .no-print, .btn-start, .action-bars, button, .theme-toggle, .cloud-actions { display: none !important; }
             .print-only { display: block; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 5px; }
             .print-text { display: inline !important; font-weight: bold; }
             .header-grid { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
@@ -123,18 +108,6 @@
 </head>
 <body>
 
-<div id="loadingOverlay"><div class="spinner"></div><div id="loadingText">Bekleniyor...</div></div>
-
-<div id="listModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 style="margin:0; font-size:18px;">📋 Kayıtlı Testler (Arşiv)</h2>
-            <button class="btn-action" style="background:transparent; border:none; font-size:20px; cursor:pointer;" onclick="document.getElementById('listModal').style.display='none'">&times;</button>
-        </div>
-        <div class="record-list" id="recordListContainer"></div>
-    </div>
-</div>
-
 <div class="container" id="dashboardView">
     <div class="print-only">
         <h1 style="margin:0;">Öktem-SBST Test Raporu</h1>
@@ -143,27 +116,23 @@
     </div>
 
     <div class="top-bar no-print">
-        <h2 style="font-size: 20px;">Klinik Kayıt Paneli</h2>
+        <h2 style="font-size: 20px;">Klinik Kayıt Paneli (Yerel Mod)</h2>
         <div class="cloud-actions">
-            <button class="btn-cloud new-test" onclick="createNewTest()">➕ Yeni</button>
-            <button class="btn-cloud load" onclick="fetchRecordsList()">☁️ Çağır</button>
-            <button class="btn-cloud save" onclick="saveToCloud()">☁️ Kaydet</button>
+            <button class="btn-cloud new-test" onclick="handleNewTest()">➕ Yeni</button>
+            <button class="btn-cloud save" onclick="saveToLocal(false)">💾 Cihaza Kaydet</button>
             <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌗 Tema</button>
         </div>
     </div>
 
-    <div id="lastModifiedBar" class="info-bar no-print">
-        <b>Bulut Durumu:</b> <span id="lastModText">Henüz buluta kaydedilmedi.</span>
-    </div>
-
+    <!-- İnputlar değiştiğinde otomatik kaydetmesi için onchange eklendi -->
     <div class="header-grid">
         <div class="input-group"><label>Sıra No:</label><input type="text" id="siraNo" class="sira-input" readonly></div>
         <div class="input-group"><label>Protokol ID:</label><input type="text" id="displayUID" class="uid-input" readonly></div>
-        <div class="input-group no-print"><label>Uygulayan:</label><input type="text" id="assessorName"></div>
-        <div class="input-group no-print"><label>Yaş:</label><input type="number" id="pAge"></div>
-        <div class="input-group"><label>Eğitim:</label><select id="pEdu"><option value="0-7">0-7 Yıl</option><option value="8-19">8-19 Yıl</option></select></div>
-        <div class="input-group"><label>Tarih:</label><input type="date" id="pDate"></div>
-        <div class="input-group"><label>Sayı Menzili:</label><input type="number" id="digitSpan"></div>
+        <div class="input-group no-print"><label>Uygulayan:</label><input type="text" id="assessorName" onchange="saveToLocal(true)"></div>
+        <div class="input-group no-print"><label>Yaş:</label><input type="number" id="pAge" onchange="saveToLocal(true)"></div>
+        <div class="input-group"><label>Eğitim:</label><select id="pEdu" onchange="saveToLocal(true)"><option value="0-7">0-7 Yıl</option><option value="8-19">8-19 Yıl</option></select></div>
+        <div class="input-group"><label>Tarih:</label><input type="date" id="pDate" onchange="saveToLocal(true)"></div>
+        <div class="input-group"><label>Sayı Menzili:</label><input type="number" id="digitSpan" onchange="saveToLocal(true)"></div>
     </div>
 
     <div class="table-responsive">
@@ -234,11 +203,6 @@
 </div>
 
 <script>
-    // =========================================
-    // APPS SCRIPT BAĞLANTISI (Burayı kendi linkinle değiştir!)
-    // =========================================
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLFBwOMrX33ePXgSG8GBHApy7oAc6n9Tj3H76Xh6aLYYxB0irP8Ai5OTtJuHY0yQNn/exec";
-    
     const words = [{k:"Davul", hint:"Çalgı / Köy düğünü"},{k:"Perde", hint:"Cama takılır"},{k:"Zil", hint:"Basılınca ses çıkarır"},{k:"Kahve", hint:"Sıcak içecek"},{k:"Okul", hint:"Çocuklar gönderilir"},{k:"Anne", hint:"Yakın sevdiğimiz"},{k:"Bahçe", hint:"Ev önünde, yeşillik"},{k:"Şapka", hint:"Güneşten korur"},{k:"Ay", hint:"Gökyüzü / Gece"},{k:"Çiftçi", hint:"Toprakla uğraşan"},{k:"Burun", hint:"Yüzümüzde organ"},{k:"Hindi", hint:"İki bacaklı hayvan"},{k:"Renk", hint:"Gökkuşağı"},{k:"Ev", hint:"İçinde yaşadığımız yer"},{k:"Nehir", hint:"Akarsu"}];
     const triplets = [["DUVAR","DAVUL","ZURNA"],["TARLA","ÇİFTÇİ","ÇİFTLİK"],["KAPI","PENCERE","PERDE"],["BOĞAZ","BURUN","KULAK"],["ÇAN","ZİL","HENDEK"],["TAVUK","HİNDİ","GİTAR"],["ÇAY","KAHVE","KAHVALTI"],["RESİM","RENK","REKLAM"],["ODA","OKUL","ÖĞRETMEN"],["EL","EV","ODUN"],["ABLA","ANNE","BABA"],["DENİZ","NEHİR","DERE"],["ÇİÇEK","BAHÇE","AĞAÇ"],["ŞARAP","ŞAPKA","KASKET"],["GÜNEŞ","AY","AYVA"]];
     const targetWordsUpper = words.map(w => w.k.toUpperCase());
@@ -247,19 +211,19 @@
     let testData = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{} };
     let intrusions = { 1:"", 2:"", 3:"", 4:"", 5:"", 6:"", 7:"", 8:"", 9:"", 10:"", "H":"", "USB":"", "TOPLU_TANIMA":"" };
     let activeKey = null, clickOrder = 1, history = [];
-    let isNewRecordSaved = false;
 
     window.onload = () => {
         document.documentElement.setAttribute('data-theme', localStorage.getItem('sbstTheme') || 'light');
-        document.getElementById('assessorName').value = localStorage.getItem('sbstAssessor') || "";
         
-        const headers = document.getElementById('tableHeaders'); const tbody = document.getElementById('mainTableBody'); const intRow = document.querySelector('.intrusion-row');
+        const headers = document.getElementById('tableHeaders'); 
+        const tbody = document.getElementById('mainTableBody'); 
+        const intRow = document.querySelector('.intrusion-row');
         
+        // Tablo Sütunlarını Oluştur
         for(let i=1; i<=10; i++) {
             headers.innerHTML += `<th><span class="print-text">${i}</span><button class="btn-start no-print" onclick="startTrial(${i})">D${i}</button></th>`;
             intRow.innerHTML += `<td id="int-${i}"></td>`;
         }
-        
         intRow.innerHTML += `<td id="int-H" style="background:#e0f2fe;"></td><td id="int-USB" style="background:var(--highlight-yellow);"></td><td id="int-TANIMA" style="background:var(--highlight-purple);"></td><td id="int-TOPLU_TANIMA" style="background:#fce7f3; color:var(--danger); font-size:10px; font-style:italic;" title="Serbest tanımadaki yanlışlar (çeldiriciler) burada listelenir."></td>`;
 
         words.forEach((w, idx) => {
@@ -272,7 +236,8 @@
             tbody.innerHTML += r;
         });
 
-        createNewTest();
+        // Sayfa açıldığında önbellekte taslak varsa yükle, yoksa yeni test aç.
+        loadFromLocal();
     };
 
     function generateAlphaNumericID() {
@@ -282,16 +247,100 @@
         return `SBST-${p1}-${p2}`;
     }
 
-    function createNewTest() {
+    // =========================================
+    // LOCAL STORAGE (CİHAZ ÖNBELLEĞİ) İŞLEMLERİ
+    // =========================================
+    
+    function saveToLocal(isSilent = false) {
+        // Otomatik Sıra Ataması
+        let sNo = document.getElementById('siraNo').value;
+        if(sNo === "" || sNo.includes("Kayıtta")) {
+            let seq = parseInt(localStorage.getItem('sbstSequence')) || 0;
+            seq = seq + 1;
+            localStorage.setItem('sbstSequence', seq);
+            document.getElementById('siraNo').value = seq;
+        }
+
+        const draft = {
+            uid: document.getElementById('displayUID').value,
+            siraNo: document.getElementById('siraNo').value,
+            assessorName: document.getElementById('assessorName').value,
+            pAge: document.getElementById('pAge').value,
+            pEdu: document.getElementById('pEdu').value,
+            pDate: document.getElementById('pDate').value,
+            digitSpan: document.getElementById('digitSpan').value,
+            testData: testData,
+            intrusions: intrusions
+        };
+
+        // Veriyi JSON yapıp tarayıcıya göm
+        localStorage.setItem('sbst_draft', JSON.stringify(draft));
+        localStorage.setItem('sbstAssessor', document.getElementById('assessorName').value);
+
+        if(!isSilent) {
+            alert("✅ Yarım kalan test başarıyla cihaza kaydedildi!");
+        }
+    }
+
+    function loadFromLocal() {
+        const draftStr = localStorage.getItem('sbst_draft');
+        if (draftStr) {
+            try {
+                const draft = JSON.parse(draftStr);
+                document.getElementById('displayUID').value = draft.uid || generateAlphaNumericID();
+                document.getElementById('siraNo').value = draft.siraNo || "";
+                document.getElementById('assessorName').value = draft.assessorName || localStorage.getItem('sbstAssessor') || "";
+                document.getElementById('pAge').value = draft.pAge || "";
+                document.getElementById('pEdu').value = draft.pEdu || "";
+                document.getElementById('pDate').value = draft.pDate || new Date().toISOString().split('T')[0];
+                document.getElementById('digitSpan').value = draft.digitSpan || "";
+                
+                testData = draft.testData || { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{} };
+                intrusions = draft.intrusions || { 1:"", 2:"", 3:"", 4:"", 5:"", 6:"", 7:"", 8:"", 9:"", 10:"", "H":"", "USB":"", "TOPLU_TANIMA":"" };
+                
+                // Eskiden kalma veri tiplerini koruma
+                if(!testData['H']) testData['H'] = {};
+                if(!testData['TOPLU_TANIMA']) testData['TOPLU_TANIMA'] = {};
+
+                updateUIFromData();
+            } catch(e) {
+                // Veri bozulmuşsa temizleyip sıfırla
+                console.error("Local draft bozuk, temizleniyor.");
+                localStorage.removeItem('sbst_draft');
+                createNewTest(true);
+            }
+        } else {
+            // Hiç taslak yoksa yeni boş test aç
+            createNewTest(true);
+        }
+    }
+
+    function handleNewTest() {
+        if(localStorage.getItem('sbst_draft')) {
+            if(!confirm("Mevcut yarım kalan bir test var. Silip yepyeni bir test açmak istediğinize emin misiniz?")) {
+                return;
+            }
+        }
+        createNewTest();
+    }
+
+    function createNewTest(force = false) {
+        localStorage.removeItem('sbst_draft'); // Eski taslağı sil
+
         document.getElementById('pAge').value = ""; document.getElementById('pEdu').value = ""; document.getElementById('digitSpan').value = "";
-        document.getElementById('lastModifiedBar').style.display = "none";
-        document.getElementById('displayUID').value = generateAlphaNumericID(); document.getElementById('pDate').valueAsDate = new Date();
+        document.getElementById('displayUID').value = generateAlphaNumericID(); 
+        document.getElementById('pDate').valueAsDate = new Date();
         document.getElementById('siraNo').value = `(Kayıtta: ${(parseInt(localStorage.getItem('sbstSequence'))||0) + 1})`;
-        isNewRecordSaved = false;
+        document.getElementById('assessorName').value = localStorage.getItem('sbstAssessor') || "";
+
         testData = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "H":{}, "USB":{}, "TANIMA":{}, "TOPLU_TANIMA":{} };
         intrusions = { 1:"", 2:"", 3:"", 4:"", 5:"", 6:"", 7:"", 8:"", 9:"", 10:"", "H":"", "USB":"", "TOPLU_TANIMA":"" };
         updateUIFromData();
     }
+
+    // =========================================
+    // TEST MANTIĞI VE ARAYÜZ (Aynı Kaldı)
+    // =========================================
 
     function startTrial(key) {
         activeKey = key; clickOrder = 1; history = [];
@@ -396,12 +445,14 @@
             for(let i=0; i<15; i++) { if(!testData[10][i]) missedCount++; }
             if(missedCount > 0) {
                 updateUIFromData(); 
+                saveToLocal(true); // Sessizce taslağı kaydet
                 startTrial('H');   
                 return;
             }
         }
         
         updateUIFromData(); 
+        saveToLocal(true); // Her tabloya dönüşte sessizce önbelleğe kaydet
         cancelTrial(); 
     }
     
@@ -452,130 +503,19 @@
         document.getElementById('resTopluY').innerText = errToplu;
     }
 
-    function toggleTheme() { const r = document.documentElement; r.setAttribute('data-theme', r.getAttribute('data-theme')==='light' ? 'dark' : 'light'); }
+    function toggleTheme() { 
+        const r = document.documentElement; 
+        const newTheme = r.getAttribute('data-theme')==='light' ? 'dark' : 'light';
+        r.setAttribute('data-theme', newTheme);
+        localStorage.setItem('sbstTheme', newTheme);
+    }
+    
     function preparePrint() { 
         let siraText = document.getElementById('siraNo').value;
         document.getElementById('printSira').innerText = siraText.replace("(Kayıtta: ", "").replace(")", "");
         document.getElementById('printUID').innerText = document.getElementById('displayUID').value; 
         document.getElementById('printAssessor').innerText = document.getElementById('assessorName').value || "......................"; 
         window.print(); 
-    }
-
-    // =========================================
-    // APPS SCRIPT BULUT İŞLEMLERİ (FETCH)
-    // =========================================
-    function saveToCloud() {
-        if(GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") return alert("Lütfen kodun sonundaki URL ayarını yapın.");
-
-        const uid = document.getElementById('displayUID').value.trim();
-        const assessor = document.getElementById('assessorName').value;
-        localStorage.setItem('sbstAssessor', assessor);
-
-        document.getElementById('loadingText').innerText = "Kaydediliyor...";
-        document.getElementById('loadingOverlay').style.display = "flex";
-        
-        if(!isNewRecordSaved && document.getElementById('siraNo').value.includes("Kayıtta")) {
-            let seq = parseInt(localStorage.getItem('sbstSequence')) || 0;
-            seq = seq + 1;
-            localStorage.setItem('sbstSequence', seq);
-            document.getElementById('siraNo').value = seq;
-            isNewRecordSaved = true;
-        }
-
-        const timestamp = new Date().toLocaleString('tr-TR');
-        const payload = {
-            action: "save", uid: uid, siraNo: document.getElementById('siraNo').value,
-            tarih: document.getElementById('pDate').value, yas: document.getElementById('pAge').value,
-            egitim: document.getElementById('pEdu').value, sayiMenzili: document.getElementById('digitSpan').value,
-            durum: "Kaydedildi", lastModified: timestamp, modifiedBy: assessor,
-            testData: { mainData: testData, errors: intrusions }
-        };
-
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST', mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(payload)
-        }).then(() => {
-            document.getElementById('loadingOverlay').style.display = "none";
-            document.getElementById('lastModifiedBar').style.display = "block";
-            document.getElementById('lastModText').innerText = `${timestamp} tarihinde ${assessor || 'Bilinmeyen'} tarafından kaydedildi.`;
-            alert("✅ Veriler Google E-Tabloya başarıyla kaydedildi!");
-        }).catch(err => {
-            document.getElementById('loadingOverlay').style.display = "none";
-            alert("❌ Kayıt başarısız.");
-        });
-    }
-
-    function fetchRecordsList() {
-        if(GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") return alert("Lütfen kodun sonundaki URL ayarını yapın.");
-        
-        document.getElementById('loadingText').innerText = "Kayıtlar aranıyor...";
-        document.getElementById('loadingOverlay').style.display = "flex";
-
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: "list" })
-        })
-        .then(response => response.json())
-        .then(res => {
-            document.getElementById('loadingOverlay').style.display = "none";
-            if(res.status === "success") {
-                const container = document.getElementById('recordListContainer');
-                container.innerHTML = "";
-                if(res.data.length === 0) {
-                    container.innerHTML = "<div style='padding:20px; text-align:center;'>Hiç kayıt bulunamadı.</div>";
-                } else {
-                    res.data.forEach(rec => {
-                        const div = document.createElement('div'); div.className = "record-item";
-                        div.innerHTML = `<div><div class="r-uid">${rec.uid} <span style="color:var(--text-main); font-size:12px;">(Sıra: ${rec.siraNo})</span></div><div class="r-info">Son İşlem: ${rec.lastModified} - ${rec.modifiedBy}</div></div><div style="font-size:20px;">➡️</div>`;
-                        div.onclick = () => loadSingleRecord(rec.uid);
-                        container.appendChild(div);
-                    });
-                }
-                document.getElementById('listModal').style.display = "flex";
-            } else { alert("❌ Liste alınamadı."); }
-        }).catch(err => {
-            document.getElementById('loadingOverlay').style.display = "none";
-            alert("❌ Bağlantı hatası.");
-        });
-    }
-
-    function loadSingleRecord(uid) {
-        document.getElementById('listModal').style.display = "none";
-        document.getElementById('loadingText').innerText = "Test verileri yükleniyor...";
-        document.getElementById('loadingOverlay').style.display = "flex";
-
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: "load", uid: uid })
-        })
-        .then(response => response.json())
-        .then(res => {
-            document.getElementById('loadingOverlay').style.display = "none";
-            if(res.status === "found") {
-                isNewRecordSaved = true;
-                document.getElementById('displayUID').value = uid;
-                document.getElementById('siraNo').value = res.siraNo;
-                document.getElementById('pAge').value = res.yas;
-                document.getElementById('pEdu').value = res.egitim;
-                document.getElementById('digitSpan').value = res.sayiMenzili;
-                
-                document.getElementById('lastModifiedBar').style.display = "block";
-                document.getElementById('lastModText').innerText = `${res.lastModified || 'Tarih Yok'} tarihinde ${res.modifiedBy || 'Bilinmeyen'} tarafından güncellendi.`;
-                
-                const cloudData = JSON.parse(res.testData);
-                testData = cloudData.mainData || cloudData;
-                intrusions = cloudData.errors || {};
-
-                if(!testData['H']) testData['H'] = {};
-                if(!testData['TOPLU_TANIMA']) testData['TOPLU_TANIMA'] = {};
-
-                updateUIFromData();
-            } else { alert("❌ Kayıt bulunamadı."); }
-        }).catch(err => {
-            document.getElementById('loadingOverlay').style.display = "none";
-            alert("❌ Veri çekilirken hata oluştu.");
-        });
     }
 </script>
 </body>
