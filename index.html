@@ -424,7 +424,7 @@
     }
 
     function saveToCloud() {
-        if(GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwXBeArILDETklbygYXgA4pIHGk8EkfPSzKQZz3Ywk_obrh0tulisSC6gBWIbqMKIZM/exec") return alert("Lütfen URL ayarını yapın.");
+        //if(GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwXBeArILDETklbygYXgA4pIHGk8EkfPSzKQZz3Ywk_obrh0tulisSC6gBWIbqMKIZM/exec") return alert("Lütfen URL ayarını yapın.");
 
         const uid = document.getElementById('displayUID').value.trim();
         if(!uid) return alert("Hata: Protokol ID boş olamaz.");
@@ -469,7 +469,7 @@
     }
 
     function loadFromCloud() {
-        if(GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwXBeArILDETklbygYXgA4pIHGk8EkfPSzKQZz3Ywk_obrh0tulisSC6gBWIbqMKIZM/exec") return alert("Lütfen URL ayarını yapın.");
+        //if(GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwXBeArILDETklbygYXgA4pIHGk8EkfPSzKQZz3Ywk_obrh0tulisSC6gBWIbqMKIZM/exec") return alert("Lütfen URL ayarını yapın.");
         const uid = document.getElementById('displayUID').value.trim();
         if(!uid || uid === "SBST-") return alert("Lütfen geri çağırmak istediğiniz Protokol ID'sini yazın.");
 
