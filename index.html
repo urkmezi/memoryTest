@@ -85,6 +85,10 @@
         .triplet-row { display: flex; gap: 10px; margin-bottom: 12px; padding: 12px; background: var(--secondary); border-radius: 6px; border: 1px solid var(--border); align-items: center; }
         .triplet-btns { display: flex; flex: 1; gap: 10px; }
 
+        /* Yorumlama Kutusu CSS */
+        .interpretation-box { background: var(--secondary); border-left: 4px solid var(--primary); padding: 16px; border-radius: 6px; margin-top: 20px; font-size: 14px; line-height: 1.6; }
+        .interpretation-box p { margin: 5px 0; }
+
         .print-only { display: none; }
         .print-text { display: none; }
         
@@ -111,6 +115,7 @@
             .results-grid { display: flex; flex-wrap: wrap; gap: 8px; border: 2px solid #000; padding: 8px; border-radius: 0; }
             .result-card { border: none; padding: 0; background: transparent; width: 23%; text-align: left; display: flex; justify-content: space-between; }
             .result-card .val { font-size: 12px; display: inline; margin-top: 0; color: #000 !important; }
+            .interpretation-box { border: 1px solid #000; border-left: 4px solid #000; break-inside: avoid; }
         }
     </style>
 </head>
@@ -190,6 +195,12 @@
         <div class="result-card" style="border-top: 3px solid var(--danger);">Tanıma(3lü) (-Y): <span class="val" id="resYanlisTanima" style="color:var(--danger);">0</span></div>
         <div class="result-card" style="border-top: 3px solid var(--pink-text);">Serbest Doğru: <span class="val" id="resTopluT" style="color:var(--pink-text);">0</span></div>
         <div class="result-card" style="border-top: 3px solid var(--danger);">Serbest Yanlış: <span class="val" id="resTopluY" style="color:var(--danger);">0</span></div>
+    </div>
+
+    <!-- YENİ YORUMLAMA MODÜLÜ -->
+    <h3 style="margin-top: 30px; font-size: 16px;">Otomatik Klinik Yorumlama</h3>
+    <div class="interpretation-box" id="interpretationBox">
+        <div id="interpretationText" style="color:var(--text-muted); font-style:italic;">Değerlendirme için testin tamamlanması ve hasta Yaş/Eğitim bilgisinin girilmesi bekleniyor...</div>
     </div>
     
     <div style="margin-top: 24px; text-align: right;" class="no-print">
@@ -645,9 +656,68 @@
             }
             document.getElementById('resTopluT').innerText = okToplu;
             document.getElementById('resTopluY').innerText = errToplu;
+            
+            // --- KLİNİK YORUMLAMA MODÜLÜ ÇAĞRISI ---
+            generateInterpretation(tot, usbCount, ok);
+
         } catch(e) {
             console.error("Skor Hesaplama Hatası:", e);
         }
+    }
+
+    // YENİ: OTOMATİK KLİNİK YORUMLAMA MODÜLÜ
+    function generateInterpretation(totalLearning, usbScore, recognitionScore) {
+        let ageInput = document.getElementById('pAge').value;
+        let eduInput = document.getElementById('pEdu').value;
+        let interpretationText = "";
+
+        if (ageInput && eduInput && testData['USB'] && testData['USB']['_done']) {
+            let age = parseInt(ageInput);
+            let isLowEdu = eduInput === "0-7";
+            let isElderly = age >= 65;
+
+            // Öktem-SBST Yaklaşık Kesme (Eşik) Puanları (Klinik normlara referansla uyarlanmıştır)
+            // Hekim bu eşikleri klinik popülasyonuna göre değiştirebilir.
+            let expectedUSB = isElderly ? (isLowEdu ? 7 : 9) : (isLowEdu ? 9 : 11);
+            let expectedTotal = isElderly ? (isLowEdu ? 80 : 95) : (isLowEdu ? 95 : 115);
+
+            interpretationText += `<p>Hasta <b>${age}</b> yaşında ve eğitim düzeyi <b>${eduInput} yıl</b> aralığındadır.</p>`;
+
+            // 1. Gecikmeli Hatırlama (USB) Analizi
+            if (usbScore < expectedUSB) {
+                interpretationText += `<p style="color:var(--danger)">⚠️ <b>Gecikmeli Hatırlama (USB):</b> Puan (${usbScore}), beklenen alt sınırın (${expectedUSB}) altındadır. Bellek izlerinin korunmasında veya geri çağrılmasında güçlük gözlenmiştir.</p>`;
+            } else {
+                interpretationText += `<p style="color:var(--success)">✅ <b>Gecikmeli Hatırlama (USB):</b> Puan (${usbScore}), beklenen normal sınırların içindedir.</p>`;
+            }
+
+            // 2. Toplam Öğrenme Analizi
+            if (totalLearning < expectedTotal) {
+                interpretationText += `<p style="color:var(--danger)">⚠️ <b>Öğrenme Süreci:</b> Toplam öğrenme skoru (${totalLearning}), beklenen alt sınırın (${expectedTotal}) altındadır. Yeni bilgiyi ardışık kayıt etme hızı yavaşlamış olabilir.</p>`;
+            } else {
+                interpretationText += `<p style="color:var(--success)">✅ <b>Öğrenme Süreci:</b> Toplam öğrenme skoru (${totalLearning}), beklenen normal sınırların içindedir.</p>`;
+            }
+
+            // 3. Profil Tipi (Kayıt vs. Geri Çağırma Ayrımı)
+            // Eğer Gecikmeli Hatırlama bozuksa, sebebini anlamak için Tanıma'ya bakılır.
+            if (usbScore < expectedUSB) {
+                if (recognitionScore >= 13) {
+                    // USB bozuk, Tanıma iyi = Bilgi depolanmış ama kendi kendine geri çağıramıyor (Frontal / Subkortikal özellikler)
+                    interpretationText += `<p style="color:var(--warning)">💡 <b>Nörobilişsel Profil:</b> Serbest hatırlama (USB) zayıf olmasına rağmen Tanıma performansı iyidir (${recognitionScore}/15). Bu tablo; birincil bir kayıt/depolama kusurundan (amnezi) ziyade, <b>'geri çağırma' (retrieval) zorluğunu</b> düşündürmektedir (Örn: Yaşa bağlı bellek zayıflığı, vasküler/subkortikal veya frontal etkilenmeler).</p>`;
+                } else {
+                    // USB bozuk, Tanıma da bozuk = Bilgi hiç depolanamamış (Amnezik sendrom)
+                    interpretationText += `<p style="color:var(--danger)">💡 <b>Nörobilişsel Profil:</b> Hem serbest hatırlama hem de ipuçlu Tanıma (${recognitionScore}/15) performansı düşüktür. Bu tablo; yeni bilginin kalıcı belleğe aktarılamadığı birincil <b>'kayıt/depolama' (storage) kusurunu</b> düşündürmektedir (Örn: Alzheimer Tipi amnezik sendromlar).</p>`;
+                }
+            } else if (totalLearning >= expectedTotal) {
+                interpretationText += `<p style="color:var(--success)">💡 <b>Nörobilişsel Profil:</b> Hastanın genel sözel bellek (kayıt, depolama ve geri çağırma) fonksiyonları yaş ve eğitim normlarına göre <b>olağan (normal)</b> olarak değerlendirilmiştir.</p>`;
+            }
+
+            interpretationText += `<hr style="margin:15px 0; border:0; border-top:1px dashed var(--border);"><p style="font-size:11px; color:var(--text-muted);"><i>Not: Bu otomatik bir ön değerlendirmedir. Kesin klinik tanı, hastanın klinik öyküsü ve diğer nöropsikolojik bataryalarla birlikte değerlendirilmelidir.</i></p>`;
+
+        } else {
+            interpretationText = "<p style='color:var(--text-muted); font-style:italic;'>Otomatik yorumlama profilinin oluşturulabilmesi için testin USB/Tanıma aşamalarının bitirilmesi ve hastanın Yaş/Eğitim bilgilerinin girilmesi gereklidir.</p>";
+        }
+
+        document.getElementById('interpretationText').innerHTML = interpretationText;
     }
 
     function toggleTheme() { 
