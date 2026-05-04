@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Öktem-SBST Dijital Asistan</title>
+    <title>Öktem-SBST Dijital Asistan (V2)</title>
     <style>
         :root { --primary: #1e40af; --secondary: #3b82f6; --success: #16a34a; --warning: #d97706; --danger: #dc2626; --bg: #f8fafc; --text: #0f172a; --border: #cbd5e1; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; font-size: 14px; }
@@ -172,13 +172,23 @@
         {k: "Nehir", hint: "Akarsu"}
     ];
     
-    // 45 Kelimelik Tanıma Listesi
-    const tanimaList = [
-        "DUVAR", "TARLA", "DAVUL", "GİTAR", "ÇİFTÇİ", "ÇİFTLİK", "KAPI", "PENCERE", 
-        "PERDE", "ZURNA", "BOĞAZ", "BURUN", "KULAK", "HİNDİ", "ZİL", "ÇAN", "TAVUK", 
-        "HENDEK", "ÇAY", "KAHVE", "KAHVALTI", "ODUN", "RESİM", "RENK", "REKLAM", "ODA", 
-        "OKUL", "ÖĞRETMEN", "EL", "EV", "ABLA", "ANNE", "DENİZ", "NEHİR", "BABA", "AĞAÇ", 
-        "DERE", "ÇİÇEK", "BAHÇE", "ŞARAP", "ŞAPKA", "KASKET", "GÜNEŞ", "AY", "AYVA"
+    // Tanıma / Zorunlu Seçme (Üçlü Gruplar)
+    const triplets = [
+        ["DUVAR", "DAVUL", "ZURNA"],
+        ["KAPI", "PENCERE", "PERDE"],
+        ["ÇAN", "ZİL", "HENDEK"],
+        ["ÇAY", "KAHVE", "KAHVALTI"],
+        ["OKUL", "ÖĞRETMEN", "ODA"],
+        ["ABLA", "ANNE", "BABA"],
+        ["ÇİÇEK", "BAHÇE", "AĞAÇ"],
+        ["ŞAPKA", "KASKET", "ŞARAP"],
+        ["GÜNEŞ", "AY", "AYVA"],
+        ["TARLA", "ÇİFTÇİ", "ÇİFTLİK"],
+        ["BOĞAZ", "BURUN", "KULAK"],
+        ["TAVUK", "HİNDİ", "GİTAR"],
+        ["RESİM", "RENK", "REKLAM"],
+        ["EL", "EV", "ODUN"],
+        ["DENİZ", "NEHİR", "DERE"]
     ];
     
     const targetWordsUpper = words.map(w => w.k.toUpperCase());
@@ -229,18 +239,26 @@
         grid.innerHTML = '';
         
         if(key === 'TANIMA') {
-            document.getElementById('trialTitle').innerText = "Tanıma Aşaması (45 Kelime)";
-            document.getElementById('trialDesc').innerText = "Kelimeleri okuyun. Hasta 'Vardı' dediğinde kelimeye tıklayın.";
+            document.getElementById('trialTitle').innerText = "Tanıma / Zorunlu Seçme (Üçlü Gruplar)";
+            document.getElementById('trialDesc').innerText = "Hastaya her gruptaki 3 kelimeyi okuyup, hangisinin listede olduğunu sorunuz. Söylediği kelimeyi tıklayınız.";
             document.getElementById('orderTrackerDiv').style.display = 'none';
             document.getElementById('intrusionBox').style.display = 'none';
             document.getElementById('undoBtn').style.display = 'none';
+            grid.style.display = 'block'; // Grid yapısını satır yapısına çevir
 
-            tanimaList.forEach((word) => {
-                grid.innerHTML += `
-                    <button class="word-btn" id="btn-tanima-${word}" onclick="handleTanimaClick('${word}')">
-                        ${word}
-                    </button>
-                `;
+            // Üçlü Grupları Ekrana Bas
+            triplets.forEach((group, index) => {
+                let rowHtml = `<div style="display:flex; gap:10px; margin-bottom:12px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0; align-items:center;">`;
+                rowHtml += `<div style="min-width:25px; font-weight:bold; color:#64748b; font-size:16px;">${index+1}.</div>`;
+                group.forEach(word => {
+                    rowHtml += `
+                        <button class="word-btn" style="flex:1; min-height:60px; font-size:16px; margin:0;" id="btn-tanima-${word}" onclick="handleTanimaClick('${word}')">
+                            ${word}
+                        </button>
+                    `;
+                });
+                rowHtml += `</div>`;
+                grid.innerHTML += rowHtml;
             });
         } else {
             let title = key === 'USB' ? "USB (Gecikmeli Hatırlama)" : key + ". Öğrenme Denemesi";
@@ -251,6 +269,7 @@
             document.getElementById('intrusionBox').style.display = 'block';
             document.getElementById('undoBtn').style.display = 'block';
             document.getElementById('intrusionInput').value = intrusions[key] || "";
+            grid.style.display = 'grid'; // Eski grid yapısına geri dön
 
             words.forEach((w, idx) => {
                 let showHint = (key === 10) ? 'display:block;' : '';
