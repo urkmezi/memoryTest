@@ -29,15 +29,21 @@
         .top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         h2, h3 { color: var(--text-main); margin: 0; font-weight: 600; }
         
-        .theme-toggle { background: var(--secondary); border: 1px solid var(--border); color: var(--text-main); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .cloud-actions { display: flex; gap: 10px; align-items: center; }
+        .theme-toggle, .btn-cloud { border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .theme-toggle { background: var(--secondary); color: var(--text-main); }
+        .btn-cloud.save { background: #0550ae; color: white; border-color: #0550ae; }
+        .btn-cloud.load { background: #2da44e; color: white; border-color: #2da44e; }
         
-        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .input-group { display: flex; flex-direction: column; }
         .input-group label { font-weight: 600; margin-bottom: 6px; font-size: 12px; }
-        .input-group input, .input-group select, .uid-box { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--bg-body); color: var(--text-main); }
-        .uid-box { background: var(--secondary); font-family: monospace; font-weight: 600; color: var(--primary); display: flex; align-items: center; }
+        .input-group input, .input-group select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--bg-body); color: var(--text-main); outline: none;}
+        .uid-input { font-family: monospace; font-weight: 600; color: var(--primary); }
+        .sira-input { font-size: 16px; font-weight: bold; color: var(--success); text-align: center; }
 
         .alert { background: rgba(207, 34, 46, 0.1); color: var(--danger); padding: 12px; border-radius: 6px; font-weight: 600; display: none; margin-top: 10px; border: 1px solid rgba(207, 34, 46, 0.4); }
+        .info-bar { background: var(--secondary); padding: 10px; border-radius: 6px; font-size: 12px; color: var(--text-muted); margin-bottom: 15px; display: none; border: 1px dashed var(--border); }
 
         .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; border: 1px solid var(--border); border-radius: 6px; }
         table { width: 100%; border-collapse: collapse; text-align: center; border-style: hidden; }
@@ -70,7 +76,10 @@
         .triplet-row { display: flex; gap: 10px; margin-bottom: 12px; padding: 12px; background: var(--secondary); border-radius: 6px; border: 1px solid var(--border); align-items: center; }
         .triplet-btns { display: flex; flex: 1; gap: 10px; }
 
-        /* Yazdırma (Print) Ayarları - Tek Sayfaya Sığması İçin Optimize Edildi */
+        #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; color: white; font-size: 20px; font-weight: bold; flex-direction: column; gap: 15px;}
+        .spinner { border: 4px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 4px solid #fff; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         .print-only { display: none; }
         .print-text { display: none; }
         
@@ -79,21 +88,17 @@
             :root { --bg-body: #fff; --bg-panel: #fff; --text-main: #000; --border: #000; --secondary: #fff; --highlight-yellow: #fff; --highlight-purple: #fff;}
             body { background: white; padding: 0; color: black; font-size: 12px; }
             .container { box-shadow: none; border: none; width: 100%; padding: 0; margin: 0; }
-            
-            .no-print, .btn-start, .action-bars, button, .theme-toggle { display: none !important; }
+            .no-print, .btn-start, .action-bars, button, .theme-toggle, .cloud-actions { display: none !important; }
             .print-only { display: block; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 10px; }
-            .print-text { display: inline !important; font-weight: bold; } /* Tablo başlıklarındaki gizli rakamları göster */
-
-            .header-grid { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
-            .input-group { flex-direction: row; gap: 5px; align-items: center; }
+            .print-text { display: inline !important; font-weight: bold; }
+            .header-grid { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+            .input-group { flex-direction: row; gap: 5px; align-items: baseline; }
             .input-group label { margin: 0; font-size: 12px; }
-            .input-group input, .input-group select, .uid-box { border: none; padding: 0; font-size: 12px; font-weight: bold; background: transparent; -webkit-appearance: none; color: #000; }
-            
+            .input-group input, .input-group select { border: none; padding: 0; font-size: 12px; font-weight: bold; background: transparent; -webkit-appearance: none; color: #000; width: auto; }
             .table-responsive { overflow: visible; border: none; margin-top: 0; }
             table { border: 2px solid #000; width: 100%; table-layout: auto; }
             th, td { border: 1px solid #000; padding: 4px; font-size: 11px; white-space: normal; }
             .word-cell { min-width: 80px; }
-
             .results-grid { display: flex; flex-wrap: wrap; gap: 10px; border: 2px solid #000; padding: 10px; border-radius: 0; }
             .result-card { border: none; padding: 0; background: transparent; width: 30%; text-align: left; display: flex; justify-content: space-between; }
             .result-card .val { font-size: 14px; display: inline; margin-top: 0; color: #000 !important; }
@@ -102,19 +107,49 @@
 </head>
 <body>
 
+<div id="loadingOverlay">
+    <div class="spinner"></div>
+    <div>Bulut ile senkronize ediliyor...</div>
+</div>
+
 <div class="container" id="dashboardView">
+    <!-- Baskı Görünümü Başlıkları (Sıra No ve Protokol) -->
     <div class="print-only">
         <h1 style="margin:0;">Öktem-SBST Test Raporu</h1>
-        <p style="margin-top:5px; font-size: 14px;">Hasta Adı Soyadı: __________________________________________________</p>
+        <div style="display:flex; justify-content:space-between; margin-top:10px;">
+            <p style="margin:0;"><b>Sıra No:</b> <span id="printSira"></span></p>
+            <p style="margin:0;"><b>Protokol ID:</b> <span id="printUID"></span></p>
+        </div>
+        <p style="margin-top:5px; font-size: 14px;">Uygulayan: <span id="printAssessor"></span></p>
     </div>
 
     <div class="top-bar no-print">
-        <h2>Klinik Kayıt Paneli</h2>
-        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌗 Koyu Tema</button>
+        <h2 style="font-size: 20px;">Klinik Kayıt Paneli</h2>
+        <div class="cloud-actions">
+            <button class="btn-cloud load" onclick="loadFromCloud()">☁️ Çağır</button>
+            <button class="btn-cloud save" onclick="saveToCloud()">☁️ Kaydet</button>
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌗 Tema</button>
+        </div>
     </div>
     
+    <div id="lastModifiedBar" class="info-bar no-print">
+        <b>Bulut Durumu:</b> <span id="lastModText">Henüz buluta kaydedilmedi.</span>
+    </div>
+
+    <!-- UI Görünümü Girdileri (Sıra No solda, UID sağda) -->
     <div class="header-grid">
-        <div class="input-group"><label>Protokol ID:</label><div class="uid-box" id="displayUID"></div></div>
+        <div class="input-group">
+            <label>Sıra No:</label>
+            <input type="number" id="siraNo" class="sira-input" title="Otomatik artar, gerekirse düzeltebilirsiniz.">
+        </div>
+        <div class="input-group">
+            <label>Protokol ID:</label>
+            <input type="text" id="displayUID" class="uid-input" title="Teste devam etmek için buraya eski ID'yi yapıştırıp Çağır'a basın.">
+        </div>
+        <div class="input-group no-print">
+            <label>Uygulayan / Değiştiren:</label>
+            <input type="text" id="assessorName" placeholder="Adınız / Ünvan">
+        </div>
         <div class="input-group no-print"><label>Yaş:</label><input type="number" id="pAge" placeholder="Örn: 65"></div>
         <div class="input-group"><label>Eğitim:</label>
             <select id="pEdu">
@@ -124,9 +159,9 @@
             </select>
         </div>
         <div class="input-group"><label>Tarih:</label><input type="date" id="pDate"></div>
-        <div class="input-group"><label>Sayı Menzili:</label><input type="number" id="digitSpan" oninput="checkMenzil()" placeholder="Ön Test"></div>
+        <div class="input-group"><label>Sayı Menzili:</label><input type="number" id="digitSpan" placeholder="Ön Test"></div>
     </div>
-    
+
     <div id="menzilAlert" class="alert no-print">⚠️ DİKKAT: Sayı menzili düşük (≤3). Yönergeye göre listeyi 10 veya 5 kelimeyle uygulayınız![cite: 1]</div>
 
     <div class="table-responsive">
@@ -135,7 +170,6 @@
                 <tr>
                     <th rowspan="2">Kelimeler</th>
                     <th colspan="10">Öğrenme Denemeleri</th>
-                    <!-- USB ve Tanıma butonları buraya taşındı, fazlalık sütunlar yok edildi -->
                     <th rowspan="2" style="background:var(--highlight-yellow); width:60px;">
                         <span class="print-text">USB</span>
                         <button class="btn-start no-print" style="background:transparent; border-color:var(--warning); color:var(--warning);" onclick="startTrial('USB')">USB</button>
@@ -145,9 +179,7 @@
                         <button class="btn-start no-print" style="background:transparent; border-color:var(--purple-text); color:var(--purple-text);" onclick="startTrial('TANIMA')">Tanıma</button>
                     </th>
                 </tr>
-                <tr id="tableHeaders">
-                    <!-- Javascript ile D1-D10 butonları ve baskı için 1-10 rakamları eklenecek -->
-                </tr>
+                <tr id="tableHeaders"></tr>
             </thead>
             <tbody id="mainTableBody"></tbody>
             <tbody id="intrusionBody"><tr class="intrusion-row"><td style="font-weight:600; background:var(--bg-panel);">Hatalar</td></tr></tbody>
@@ -165,7 +197,7 @@
     </div>
     
     <div style="margin-top: 24px; text-align: right;" class="no-print">
-        <button class="btn-large" style="display:inline-flex; width: auto; background:var(--secondary); color:var(--text-main);" onclick="window.print()">🖨️ PDF / Yazdır</button>
+        <button class="btn-large" style="display:inline-flex; width: auto; background:var(--secondary); color:var(--text-main);" onclick="preparePrint()">🖨️ PDF / Yazdır</button>
     </div>
 </div>
 
@@ -195,24 +227,34 @@
 </div>
 
 <script>
+    const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
+
     function toggleTheme() {
         const root = document.documentElement;
         if (root.getAttribute('data-theme') === 'light') {
             root.setAttribute('data-theme', 'dark');
+            localStorage.setItem('sbstTheme', 'dark');
             document.getElementById('themeBtn').innerHTML = '☀️ Açık Tema';
         } else {
             root.setAttribute('data-theme', 'light');
+            localStorage.setItem('sbstTheme', 'light');
             document.getElementById('themeBtn').innerHTML = '🌗 Koyu Tema';
         }
     }
 
-    // Gerçek Alfanümerik ID (Örn: SBST-9A4K-X7P2)
     function generateAlphaNumericID() {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let p1 = '', p2 = '';
         for (let i = 0; i < 4; i++) p1 += chars.charAt(Math.floor(Math.random() * chars.length));
         for (let i = 0; i < 4; i++) p2 += chars.charAt(Math.floor(Math.random() * chars.length));
         return `SBST-${p1}-${p2}`;
+    }
+
+    function getNextSequenceNumber() {
+        let seq = parseInt(localStorage.getItem('sbstSequence')) || 0;
+        seq = seq + 1;
+        localStorage.setItem('sbstSequence', seq);
+        return seq;
     }
 
     const words = [
@@ -232,19 +274,25 @@
     ];
     
     const targetWordsUpper = words.map(w => w.k.toUpperCase());
+    
     let testData = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{}, 9:{}, 10:{}, "USB":{}, "TANIMA":{} };
     let intrusions = { 1:"", 2:"", 3:"", 4:"", 5:"", 6:"", 7:"", 8:"", 9:"", 10:"", "USB":"" };
     let activeKey = null, clickOrder = 1, history = [];
 
     window.onload = () => {
-        document.getElementById('displayUID').innerText = generateAlphaNumericID();
+        const savedTheme = localStorage.getItem('sbstTheme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeBtn').innerHTML = savedTheme === 'dark' ? '☀️ Açık Tema' : '🌗 Koyu Tema';
+
+        document.getElementById('assessorName').value = localStorage.getItem('sbstAssessor') || "";
+        document.getElementById('displayUID').value = generateAlphaNumericID();
         document.getElementById('pDate').valueAsDate = new Date();
+        document.getElementById('siraNo').value = getNextSequenceNumber();
 
         const headers = document.getElementById('tableHeaders');
         const tbody = document.getElementById('mainTableBody');
         const intRow = document.querySelector('.intrusion-row');
 
-        // Boş kutucukları (yatay kırmızı yuvarlak) gidermek için baskıda görünecek rakamlar (print-text) eklendi
         for(let i=1; i<=10; i++) {
             headers.innerHTML += `<th><span class="print-text">${i}</span><button class="btn-start no-print" onclick="startTrial(${i})">D${i}</button></th>`;
             intRow.innerHTML += `<td id="int-${i}"></td>`;
@@ -324,21 +372,30 @@
     }
 
     function saveAndReturn() {
-        if(activeKey !== 'TANIMA') {
-            intrusions[activeKey] = document.getElementById('intrusionInput').value;
-            document.getElementById(`int-${activeKey}`).innerText = intrusions[activeKey];
-            words.forEach((w, i) => document.getElementById(`c-${activeKey}-${i}`).innerText = testData[activeKey][i] || "");
-        } else {
-            words.forEach((w, i) => {
-                let target = targetWordsUpper[i];
-                let gIdx = triplets.findIndex(g => g.includes(target));
-                let sel = testData['TANIMA'][gIdx];
-                let cell = document.getElementById(`c-TANIMA-${i}`);
-                cell.innerText = sel === target ? "+T" : (sel ? "-Y" : "");
-                cell.style.color = sel === target ? "var(--success)" : "var(--danger)";
-            });
+        if(activeKey !== 'TANIMA') intrusions[activeKey] = document.getElementById('intrusionInput').value;
+        updateUIFromData();
+        cancelTrial();
+    }
+
+    function updateUIFromData() {
+        for(let key=1; key<=10; key++) {
+            document.getElementById(`int-${key}`).innerText = intrusions[key] || "";
+            words.forEach((w, i) => document.getElementById(`c-${key}-${i}`).innerText = testData[key][i] || "");
         }
-        calculateScores(); cancelTrial();
+        
+        document.getElementById(`int-USB`).innerText = intrusions["USB"] || "";
+        words.forEach((w, i) => document.getElementById(`c-USB-${i}`).innerText = testData["USB"][i] || "");
+
+        words.forEach((w, i) => {
+            let target = targetWordsUpper[i];
+            let gIdx = triplets.findIndex(g => g.includes(target));
+            let sel = testData['TANIMA'][gIdx];
+            let cell = document.getElementById(`c-TANIMA-${i}`);
+            cell.innerText = sel === target ? "+T" : (sel ? "-Y" : "");
+            cell.style.color = sel === target ? "var(--success)" : "var(--danger)";
+        });
+
+        calculateScores();
     }
 
     function calculateScores() {
@@ -359,9 +416,94 @@
         document.getElementById('resYanlisTanima').innerText = err;
     }
 
-    function checkMenzil() {
-        const v = document.getElementById('digitSpan').value;
-        document.getElementById('menzilAlert').style.display = (v && v <= 3) ? 'block' : 'none';
+    function preparePrint() {
+        document.getElementById('printSira').innerText = document.getElementById('siraNo').value;
+        document.getElementById('printUID').innerText = document.getElementById('displayUID').value;
+        document.getElementById('printAssessor').innerText = document.getElementById('assessorName').value || "......................";
+        window.print();
+    }
+
+    function saveToCloud() {
+        if(GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") return alert("Lütfen URL ayarını yapın.");
+
+        const uid = document.getElementById('displayUID').value.trim();
+        if(!uid) return alert("Hata: Protokol ID boş olamaz.");
+        
+        const assessor = document.getElementById('assessorName').value;
+        localStorage.setItem('sbstAssessor', assessor);
+
+        document.getElementById('loadingOverlay').style.display = "flex";
+        
+        const timestamp = new Date().toLocaleString('tr-TR');
+
+        const payload = {
+            action: "save",
+            uid: uid,
+            siraNo: document.getElementById('siraNo').value,
+            tarih: document.getElementById('pDate').value,
+            yas: document.getElementById('pAge').value,
+            egitim: document.getElementById('pEdu').value,
+            sayiMenzili: document.getElementById('digitSpan').value,
+            durum: "Kaydedildi",
+            lastModified: timestamp,
+            modifiedBy: assessor,
+            testData: { mainData: testData, errors: intrusions }
+        };
+
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            document.getElementById('loadingOverlay').style.display = "none";
+            document.getElementById('lastModifiedBar').style.display = "block";
+            document.getElementById('lastModText').innerText = `${timestamp} tarihinde ${assessor || 'Bilinmeyen'} tarafından kaydedildi.`;
+            alert("✅ Veriler buluta başarıyla kaydedildi!");
+        })
+        .catch(err => {
+            document.getElementById('loadingOverlay').style.display = "none";
+            alert("❌ Kayıt başarısız.");
+        });
+    }
+
+    function loadFromCloud() {
+        if(GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwXBeArILDETklbygYXgA4pIHGk8EkfPSzKQZz3Ywk_obrh0tulisSC6gBWIbqMKIZM/exec") return alert("Lütfen URL ayarını yapın.");
+        const uid = document.getElementById('displayUID').value.trim();
+        if(!uid || uid === "SBST-") return alert("Lütfen geri çağırmak istediğiniz Protokol ID'sini yazın.");
+
+        document.getElementById('loadingOverlay').style.display = "flex";
+        const payload = { action: "load", uid: uid };
+
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(res => {
+            document.getElementById('loadingOverlay').style.display = "none";
+            if(res.status === "found") {
+                document.getElementById('siraNo').value = res.siraNo;
+                document.getElementById('pAge').value = res.yas;
+                document.getElementById('pEdu').value = res.egitim;
+                document.getElementById('digitSpan').value = res.sayiMenzili;
+                
+                document.getElementById('lastModifiedBar').style.display = "block";
+                document.getElementById('lastModText').innerText = `${res.lastModified || 'Tarih Yok'} tarihinde ${res.modifiedBy || 'Bilinmeyen'} tarafından güncellendi.`;
+                
+                const cloudData = JSON.parse(res.testData);
+                testData = cloudData.mainData;
+                intrusions = cloudData.errors;
+
+                updateUIFromData();
+                alert(`✅ ${uid} ID'li test başarıyla yüklendi.`);
+            } else { alert("❌ Bu ID'ye ait bir kayıt bulunamadı."); }
+        })
+        .catch(err => {
+            document.getElementById('loadingOverlay').style.display = "none";
+            alert("❌ Buluttan çekerken bir hata oluştu.");
+        });
     }
 </script>
 </body>
