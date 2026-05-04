@@ -11,6 +11,8 @@
             --border: #d0d7de; --primary: #0969da; --secondary: #f3f4f6; --secondary-hover: #ebecf0;
             --success: #2da44e; --danger: #cf222e; --warning: #bf8700;
             --highlight-yellow: #fff8c5; --highlight-purple: #f3f0ff; --purple-text: #8250df;
+            --highlight-blue: #e0f2fe; --blue-text: #0284c7;
+            --highlight-pink: #fce7f3; --pink-text: #db2777;
             --shadow: 0 3px 6px rgba(140,149,159,0.15);
         }
         :root[data-theme="dark"] {
@@ -18,7 +20,10 @@
             --border: #30363d; --primary: #58a6ff; --secondary: #21262d; --secondary-hover: #30363d;
             --success: #3fb950; --danger: #f85149; --warning: #d29922;
             --highlight-yellow: rgba(210, 153, 34, 0.15); --highlight-purple: rgba(130, 80, 223, 0.15);
-            --purple-text: #bc8cff; --shadow: 0 3px 6px rgba(0,0,0,0.4);
+            --purple-text: #bc8cff; 
+            --highlight-blue: rgba(14, 165, 233, 0.15); --blue-text: #38bdf8;
+            --highlight-pink: rgba(219, 39, 119, 0.15); --pink-text: #f472b6;
+            --shadow: 0 3px 6px rgba(0,0,0,0.4);
         }
 
         * { box-sizing: border-box; }
@@ -85,7 +90,11 @@
         
         @media print {
             @page { size: A4 landscape; margin: 0.5cm; }
-            :root { --bg-body: #fff; --bg-panel: #fff; --text-main: #000; --border: #000; --secondary: #fff; --highlight-yellow: #fff; --highlight-purple: #fff;}
+            :root { 
+                --bg-body: #fff; --bg-panel: #fff; --text-main: #000; --border: #000; --secondary: #fff; 
+                --highlight-yellow: #fff; --highlight-purple: #fff; --highlight-blue: #fff; --highlight-pink: #fff;
+                --blue-text: #000; --pink-text: #000; --purple-text: #000; --warning: #000; --danger: #000; --success: #000;
+            }
             body { background: white; padding: 0; color: black; font-size: 11px; }
             .container { box-shadow: none; border: none; padding: 0; margin: 0; max-width: 100%; width: 100%; }
             .no-print, .btn-start, .action-bars, button, .theme-toggle, .cloud-actions { display: none !important; }
@@ -118,10 +127,10 @@
     </div>
 
     <div class="top-bar no-print">
-        <h2 style="font-size: 20px;">Öktem - SBST Klinik Asistan </h2>
+        <h2 style="font-size: 20px;">Klinik Kayıt Paneli (Yerel Mod)</h2>
         <div class="cloud-actions">
             <button class="btn-cloud new-test" onclick="handleNewTest()">➕ Yeni</button>
-            <button class="btn-cloud save" onclick="saveToLocal(false)">💾 Kaydet</button>
+            <button class="btn-cloud save" onclick="saveToLocal(false)">💾 Cihaza Kaydet</button>
             <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌗 Tema</button>
         </div>
     </div>
@@ -149,8 +158,8 @@
                 <tr>
                     <th rowspan="2">Kelimeler</th>
                     <th colspan="10">Öğrenme Denemeleri</th>
-                    <th rowspan="2" style="background:#e0f2fe; width:50px;">
-                        <span class="print-text">Hatırlatma</span><button class="btn-start no-print" style="background:transparent; border-color:#0284c7; color:#0284c7;" onclick="startTrial('H')">Hatırlatma</button>
+                    <th rowspan="2" style="background:var(--highlight-blue); width:50px;">
+                        <span class="print-text">Hatırlatma</span><button class="btn-start no-print" style="background:transparent; border-color:var(--blue-text); color:var(--blue-text);" onclick="startTrial('H')">Hatırlatma</button>
                     </th>
                     <th rowspan="2" style="background:var(--highlight-yellow); width:50px;">
                         <span class="print-text">USB</span><button class="btn-start no-print" style="color:var(--warning);" onclick="startTrial('USB')">USB</button>
@@ -158,8 +167,8 @@
                     <th rowspan="2" style="background:var(--highlight-purple); width:50px;">
                         <span class="print-text">Tanıma(3lü)</span><button class="btn-start no-print" style="color:var(--purple-text);" onclick="startTrial('TANIMA')">Tanıma</button>
                     </th>
-                    <th rowspan="2" style="background:#fce7f3; width:60px;">
-                        <span class="print-text">Serbest T.</span><button class="btn-start no-print" style="background:transparent; border-color:#db2777; color:#db2777;" onclick="startTrial('TOPLU_TANIMA')">45 Kelime</button>
+                    <th rowspan="2" style="background:var(--highlight-pink); width:60px;">
+                        <span class="print-text">Serbest T.</span><button class="btn-start no-print" style="background:transparent; border-color:var(--pink-text); color:var(--pink-text);" onclick="startTrial('TOPLU_TANIMA')">45 Kelime</button>
                     </th>
                 </tr>
                 <tr id="tableHeaders"></tr>
@@ -179,7 +188,7 @@
         <div class="result-card" style="border-top: 3px solid var(--warning);">USB: <span class="val" id="resUSB" style="color:var(--warning);">0</span></div>
         <div class="result-card" style="border-top: 3px solid var(--purple-text);">Tanıma(3lü) (+T): <span class="val" id="resTanima" style="color:var(--purple-text);">0</span></div>
         <div class="result-card" style="border-top: 3px solid var(--danger);">Tanıma(3lü) (-Y): <span class="val" id="resYanlisTanima" style="color:var(--danger);">0</span></div>
-        <div class="result-card" style="border-top: 3px solid #db2777;">Serbest Doğru: <span class="val" id="resTopluT" style="color:#db2777;">0</span></div>
+        <div class="result-card" style="border-top: 3px solid var(--pink-text);">Serbest Doğru: <span class="val" id="resTopluT" style="color:var(--pink-text);">0</span></div>
         <div class="result-card" style="border-top: 3px solid var(--danger);">Serbest Yanlış: <span class="val" id="resTopluY" style="color:var(--danger);">0</span></div>
     </div>
     
@@ -204,7 +213,7 @@
 
     <div class="action-bars">
         <button class="btn-large btn-undo" id="undoBtn" onclick="undoLastClick()">↩ Geri Al</button>
-        <button class="btn-large btn-save" onclick="saveAndReturn()">💾 Kaydet</button>
+        <button class="btn-large btn-save" onclick="saveAndReturn()">💾 Kaydet ve Dön</button>
     </div>
 </div>
 
@@ -235,22 +244,21 @@
             headers.innerHTML += `<th><span class="print-text">${i}</span><button class="btn-start no-print" onclick="startTrial(${i})">D${i}</button></th>`;
             intRow.innerHTML += `<td id="int-${i}"></td>`;
         }
-        intRow.innerHTML += `<td id="int-H" style="background:#e0f2fe;"></td><td id="int-USB" style="background:var(--highlight-yellow);"></td><td id="int-TANIMA" style="background:var(--highlight-purple);"></td><td id="int-TOPLU_TANIMA" style="background:#fce7f3; color:var(--danger); font-size:10px; font-style:italic;" title="Serbest tanımadaki yanlışlar (çeldiriciler) burada listelenir."></td>`;
+        intRow.innerHTML += `<td id="int-H" style="background:var(--highlight-blue);"></td><td id="int-USB" style="background:var(--highlight-yellow);"></td><td id="int-TANIMA" style="background:var(--highlight-purple);"></td><td id="int-TOPLU_TANIMA" style="background:var(--highlight-pink); color:var(--danger); font-size:10px; font-style:italic;" title="Serbest tanımadaki yanlışlar (çeldiriciler) burada listelenir."></td>`;
 
         words.forEach((w, idx) => {
             let r = `<tr><td class="word-cell">${w.k}</td>`;
             for(let i=1; i<=10; i++) r += `<td id="c-${i}-${idx}"></td>`;
-            r += `<td id="c-H-${idx}" style="background:#e0f2fe; font-weight:bold; color:#0284c7; text-align:center;"></td>`;
+            r += `<td id="c-H-${idx}" style="background:var(--highlight-blue); font-weight:bold; color:var(--blue-text); text-align:center;"></td>`;
             r += `<td id="c-USB-${idx}" style="background:var(--highlight-yellow);"></td>`;
             r += `<td id="c-TANIMA-${idx}" style="background:var(--highlight-purple); font-weight:bold; text-align:center;"></td>`;
-            r += `<td id="c-TOPLU_TANIMA-${idx}" style="background:#fce7f3; font-weight:bold; text-align:center;"></td></tr>`;
+            r += `<td id="c-TOPLU_TANIMA-${idx}" style="background:var(--highlight-pink); font-weight:bold; text-align:center;"></td></tr>`;
             tbody.innerHTML += r;
         });
 
         loadFromLocal();
     };
 
-    // Bugünün tarihini formatlı (YYYY-MM-DD) almak için yardımcı fonksiyon
     function getTodayString() {
         const tzoffset = (new Date()).getTimezoneOffset() * 60000;
         return (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
@@ -273,7 +281,7 @@
             localStorage.setItem('sbst_draft', JSON.stringify(draft));
             localStorage.setItem('sbstAssessor', document.getElementById('assessorName').value);
 
-            if(!isSilent) alert("✅ Yarım kalan test başarıyla kaydedildi!");
+            if(!isSilent) alert("✅ Yarım kalan test başarıyla cihaza kaydedildi!");
         } catch(err) {
             console.error(err);
         }
@@ -457,26 +465,26 @@
             if(activeKey === 'H') testData['H']['_done'] = true;
             if(activeKey === 'TANIMA') testData['TANIMA']['_done'] = true;
 
-            // D10 KAYDEDİLDİĞİNDE OTOMATİK HATIRLATMAYA GEÇİŞ
             if(activeKey === 10) {
                 let missedCount = 0;
                 for(let i=0; i<15; i++) { if(!testData[10][i]) missedCount++; }
                 if(missedCount > 0) {
                     updateUIFromData(); 
                     saveToLocal(true); 
+                    alert("Bilgi: D10 tamamlandı.\nŞimdi otomatik olarak bilinemeyen kelimeler için 'Hatırlatma (İpuçları)' aşamasına yönlendiriliyorsunuz.");
                     startTrial('H');   
                     return; 
                 } else {
                     testData['H']['_done'] = true; 
                 }
             }
-            // USB KAYDEDİLDİĞİNDE OTOMATİK TANIMAYA GEÇİŞ
             else if (activeKey === 'USB') {
                 let missedCount = 0;
                 for(let i=0; i<15; i++) { if(!testData['USB'][i]) missedCount++; }
                 if(missedCount > 0) {
                     updateUIFromData(); 
                     saveToLocal(true); 
+                    alert("Bilgi: USB tamamlandı.\nŞimdi otomatik olarak bilinemeyen kelimeler için 'Tanıma (Üçlü)' aşamasına yönlendiriliyorsunuz.");
                     startTrial('TANIMA');   
                     return; 
                 } else {
