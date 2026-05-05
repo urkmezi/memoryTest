@@ -100,11 +100,10 @@
         }
 
         .print-only { display: none; }
-        .print-text { display: none; }
         
-        /* ÖZEL DİKEY (PORTRAIT) YAZDIRMA CSS AYARLARI */
+        /* GÜVENLİ YAZDIRMA CSS AYARLARI */
         @media print {
-            @page { size: A4 portrait; margin: 1cm; }
+            @page { size: auto; margin: 1cm; }
             :root { 
                 --bg-body: #fff; --bg-panel: #fff; --text-main: #000; --border: #000; --secondary: #fff; 
                 --highlight-yellow: #fff; --highlight-purple: #fff; --highlight-blue: #fff; --highlight-pink: #fff; --highlight-green: #fff;
@@ -113,28 +112,23 @@
             body { background: white; padding: 0; color: black; font-size: 10px; line-height: 1.3; }
             .container { box-shadow: none; border: none; padding: 0; margin: 0; width: 100%; max-width: 100%; }
             
-            /* Gereksizleri gizle */
             .no-print, .btn-start, .action-bars, button, .theme-toggle, .cloud-actions, .header-grid { display: none !important; }
             
-            /* Üst Bilgi Başlığı */
             .print-only { display: block; margin-bottom: 15px; }
             .print-text { display: block !important; font-weight: bold; font-size: 8px; }
             
             h3 { font-size: 13px; margin: 15px 0 5px 0; border-bottom: 1px solid #ccc; padding-bottom: 3px; }
             
-            /* Sıkıştırılmış Tablo */
             .table-responsive { overflow: visible; border: none; margin-top: 0; }
-            table { border: 1.5px solid #000; width: 100%; table-layout: fixed; border-collapse: collapse; }
-            th, td { border: 1px solid #000; padding: 4px 2px; font-size: 9px; text-align: center; word-wrap: break-word; white-space: normal; }
+            table { border: 1.5px solid #000; width: 100%; table-layout: auto; border-collapse: collapse; }
+            th, td { border: 1px solid #000; padding: 4px 2px; font-size: 9px; text-align: center; }
             th { font-size: 8px; }
-            .word-cell { text-align: left; width: 55px; font-size: 9px; font-weight: bold; }
+            .word-cell { text-align: left; white-space: nowrap; font-size: 9px; font-weight: bold; }
             
-            /* Sıkıştırılmış Sonuç Izgarası */
             .results-grid { display: flex; flex-wrap: wrap; gap: 6px; border: 1.5px solid #000; padding: 8px; border-radius: 0; margin-top: 10px; }
             .result-card { border: none; padding: 0; width: 23%; display: flex; justify-content: space-between; align-items: center; background: transparent; text-align: left; }
             .result-card .val { font-size: 12px; font-weight: bold; display: inline; margin: 0; color: #000 !important; }
             
-            /* Yorumlama ve Alt Bilgi */
             .interpretation-box { border: 1px solid #000; border-left: 4px solid #000; padding: 10px; font-size: 10px; margin-top: 10px; break-inside: avoid; }
             .norm-table-info { border: 1px dashed #000; padding: 4px; margin-top: 5px; font-size: 9px; }
             .reference-footer { margin-top: 20px; padding-top: 8px; font-size: 8px; border-top: 1px solid #000; }
@@ -171,9 +165,9 @@
     </div>
 
     <div class="header-grid">
-        <div class="input-group"><label>Hasta Adı / Rumuz:</label><input type="text" id="pName" placeholder="Ad Soyad" onchange="saveToLocal(true)"></div>
-        <div class="input-group"><label>Yaş:</label><input type="number" id="pAge" onchange="saveToLocal(true)"></div>
-        <div class="input-group">
+        <div class="input-group no-print"><label>Hasta Adı / Rumuz:</label><input type="text" id="pName" placeholder="Ad Soyad" onchange="saveToLocal(true)"></div>
+        <div class="input-group no-print"><label>Yaş:</label><input type="number" id="pAge" onchange="saveToLocal(true)"></div>
+        <div class="input-group no-print">
             <label>Cinsiyet:</label>
             <select id="pGender" onchange="saveToLocal(true)">
                 <option value="">Seçiniz...</option>
@@ -183,7 +177,7 @@
         </div>
         <div class="input-group"><label>Eğitim:</label><select id="pEdu" onchange="saveToLocal(true)"><option value="0-7">0-7 Yıl</option><option value="8-19">8-19 Yıl</option></select></div>
         <div class="input-group"><label>Tarih:</label><input type="date" id="pDate" onchange="saveToLocal(true)"></div>
-        <div class="input-group"><label>Uygulayan:</label><input type="text" id="assessorName" onchange="saveToLocal(true)"></div>
+        <div class="input-group no-print"><label>Uygulayan:</label><input type="text" id="assessorName" onchange="saveToLocal(true)"></div>
         <div class="input-group"><label>Sayı Menzili:</label><input type="number" id="digitSpan" onchange="saveToLocal(true)"></div>
     </div>
 
@@ -900,23 +894,31 @@
     }
     
     function preparePrint() { 
-        let rawDate = document.getElementById('pDate').value;
-        let formattedDate = rawDate ? rawDate.split('-').reverse().join('.') : "......................";
-        
-        document.getElementById('printPatientName').innerText = document.getElementById('pName').value || "......................";
-        document.getElementById('printDate').innerText = formattedDate;
-        document.getElementById('printAssessor').innerText = document.getElementById('assessorName').value || "......................"; 
-        
-        let age = document.getElementById('pAge').value || "...";
-        let gender = document.getElementById('pGender').value || "...";
-        document.getElementById('printAgeGender').innerText = `${age} / ${gender}`;
-        
-        let eduSelect = document.getElementById('pEdu');
-        document.getElementById('printEdu').innerText = eduSelect.options[eduSelect.selectedIndex].text || "...";
-        
-        document.getElementById('printDigitSpan').innerText = document.getElementById('digitSpan').value || "...";
+        try {
+            let rawDate = document.getElementById('pDate') ? document.getElementById('pDate').value : "";
+            let formattedDate = rawDate ? rawDate.split('-').reverse().join('.') : "......................";
+            
+            if(document.getElementById('printPatientName')) document.getElementById('printPatientName').innerText = document.getElementById('pName') ? document.getElementById('pName').value || "......................" : "";
+            if(document.getElementById('printDate')) document.getElementById('printDate').innerText = formattedDate;
+            if(document.getElementById('printAssessor')) document.getElementById('printAssessor').innerText = document.getElementById('assessorName') ? document.getElementById('assessorName').value || "......................" : ""; 
+            
+            let age = document.getElementById('pAge') ? document.getElementById('pAge').value || "..." : "...";
+            let gender = document.getElementById('pGender') ? document.getElementById('pGender').value || "..." : "...";
+            if(document.getElementById('printAgeGender')) document.getElementById('printAgeGender').innerText = `${age} / ${gender}`;
+            
+            let eduSelect = document.getElementById('pEdu');
+            let eduText = (eduSelect && eduSelect.selectedIndex >= 0) ? eduSelect.options[eduSelect.selectedIndex].text : "...";
+            if(document.getElementById('printEdu')) document.getElementById('printEdu').innerText = eduText;
+            
+            if(document.getElementById('printDigitSpan')) document.getElementById('printDigitSpan').innerText = document.getElementById('digitSpan') ? document.getElementById('digitSpan').value || "..." : "...";
 
-        window.print(); 
+            // Hata önleyici zırh ve gecikme (DOM layout çakışmasını engeller)
+            setTimeout(() => { window.print(); }, 100);
+            
+        } catch(e) {
+            console.error("Yazdırma hatası:", e);
+            window.print(); // Her şeye rağmen yazdırmayı dene
+        }
     }
 </script>
 </body>
