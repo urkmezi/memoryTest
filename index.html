@@ -102,32 +102,43 @@
         .print-only { display: none; }
         .print-text { display: none; }
         
+        /* ÖZEL DİKEY (PORTRAIT) YAZDIRMA CSS AYARLARI */
         @media print {
-            @page { size: A4 landscape; margin: 0.5cm; }
+            @page { size: A4 portrait; margin: 1cm; }
             :root { 
                 --bg-body: #fff; --bg-panel: #fff; --text-main: #000; --border: #000; --secondary: #fff; 
                 --highlight-yellow: #fff; --highlight-purple: #fff; --highlight-blue: #fff; --highlight-pink: #fff; --highlight-green: #fff;
                 --blue-text: #000; --pink-text: #000; --purple-text: #000; --green-text: #000; --warning: #000; --danger: #000; --success: #000;
             }
-            body { background: white; padding: 0; color: black; font-size: 11px; }
-            .container { box-shadow: none; border: none; padding: 0; margin: 0; max-width: 100%; width: 100%; }
-            .no-print, .btn-start, .action-bars, button, .theme-toggle, .cloud-actions { display: none !important; }
-            .print-only { display: block; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 5px; }
-            .print-text { display: inline !important; font-weight: bold; }
-            .header-grid { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
-            .input-group { flex-direction: row; gap: 5px; align-items: baseline; }
-            .input-group label { margin: 0; font-size: 11px; }
-            .input-group input, .input-group select { border: none; padding: 0; font-size: 11px; font-weight: bold; background: transparent; -webkit-appearance: none; color: #000; width: auto; }
+            body { background: white; padding: 0; color: black; font-size: 10px; line-height: 1.3; }
+            .container { box-shadow: none; border: none; padding: 0; margin: 0; width: 100%; max-width: 100%; }
+            
+            /* Gereksizleri gizle */
+            .no-print, .btn-start, .action-bars, button, .theme-toggle, .cloud-actions, .header-grid { display: none !important; }
+            
+            /* Üst Bilgi Başlığı */
+            .print-only { display: block; margin-bottom: 15px; }
+            .print-text { display: block !important; font-weight: bold; font-size: 8px; }
+            
+            h3 { font-size: 13px; margin: 15px 0 5px 0; border-bottom: 1px solid #ccc; padding-bottom: 3px; }
+            
+            /* Sıkıştırılmış Tablo */
             .table-responsive { overflow: visible; border: none; margin-top: 0; }
-            table { border: 2px solid #000; width: 100%; table-layout: auto; }
-            th, td { border: 1px solid #000; padding: 3px; font-size: 10px; white-space: normal; }
-            .word-cell { min-width: 70px; font-size: 10px; }
-            .results-grid { display: flex; flex-wrap: wrap; gap: 8px; border: 2px solid #000; padding: 8px; border-radius: 0; }
-            .result-card { border: none; padding: 0; background: transparent; width: 23%; text-align: left; display: flex; justify-content: space-between; }
-            .result-card .val { font-size: 12px; display: inline; margin-top: 0; color: #000 !important; }
-            .interpretation-box { border: 1px solid #000; border-left: 4px solid #000; break-inside: avoid; }
-            .reference-footer { margin-top: 20px; padding-top: 5px; font-size: 9px; }
-            .developer-credit { color: #000; }
+            table { border: 1.5px solid #000; width: 100%; table-layout: fixed; border-collapse: collapse; }
+            th, td { border: 1px solid #000; padding: 4px 2px; font-size: 9px; text-align: center; word-wrap: break-word; white-space: normal; }
+            th { font-size: 8px; }
+            .word-cell { text-align: left; width: 55px; font-size: 9px; font-weight: bold; }
+            
+            /* Sıkıştırılmış Sonuç Izgarası */
+            .results-grid { display: flex; flex-wrap: wrap; gap: 6px; border: 1.5px solid #000; padding: 8px; border-radius: 0; margin-top: 10px; }
+            .result-card { border: none; padding: 0; width: 23%; display: flex; justify-content: space-between; align-items: center; background: transparent; text-align: left; }
+            .result-card .val { font-size: 12px; font-weight: bold; display: inline; margin: 0; color: #000 !important; }
+            
+            /* Yorumlama ve Alt Bilgi */
+            .interpretation-box { border: 1px solid #000; border-left: 4px solid #000; padding: 10px; font-size: 10px; margin-top: 10px; break-inside: avoid; }
+            .norm-table-info { border: 1px dashed #000; padding: 4px; margin-top: 5px; font-size: 9px; }
+            .reference-footer { margin-top: 20px; padding-top: 8px; font-size: 8px; border-top: 1px solid #000; }
+            .developer-credit { color: #000; margin-top: 5px;}
         }
     </style>
 </head>
@@ -135,12 +146,19 @@
 
 <div class="container" id="dashboardView">
     <div class="print-only">
-        <h1 style="margin:0;">Öktem-SBST Test Raporu</h1>
-        <p style="margin-top:10px; font-size:14px;">
-            <b>Hasta Adı:</b> <span id="printPatientName"></span> &nbsp; | &nbsp; 
-            <b>Tarih:</b> <span id="printDate"></span>
-        </p>
-        <p style="margin-top:5px; font-size: 14px;">Uygulayan: <span id="printAssessor"></span></p>
+        <h1 style="margin:0; text-align:center; font-size:18px; text-transform:uppercase;">Öktem-SBST Test Raporu</h1>
+        <div style="display:flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 8px; margin-top: 15px; font-size: 12px;">
+            <div style="line-height: 1.6;">
+                <b>Hasta Adı / Rumuz:</b> <span id="printPatientName"></span><br>
+                <b>Yaş / Cinsiyet:</b> <span id="printAgeGender"></span><br>
+                <b>Eğitim Düzeyi:</b> <span id="printEdu"></span>
+            </div>
+            <div style="text-align: right; line-height: 1.6;">
+                <b>Uygulama Tarihi:</b> <span id="printDate"></span><br>
+                <b>Uygulayan:</b> <span id="printAssessor"></span><br>
+                <b>Sayı Menzili:</b> <span id="printDigitSpan"></span>
+            </div>
+        </div>
     </div>
 
     <div class="top-bar no-print">
@@ -153,9 +171,9 @@
     </div>
 
     <div class="header-grid">
-        <div class="input-group no-print"><label>Hasta Adı / Rumuz:</label><input type="text" id="pName" placeholder="Ad Soyad" onchange="saveToLocal(true)"></div>
-        <div class="input-group no-print"><label>Yaş:</label><input type="number" id="pAge" onchange="saveToLocal(true)"></div>
-        <div class="input-group no-print">
+        <div class="input-group"><label>Hasta Adı / Rumuz:</label><input type="text" id="pName" placeholder="Ad Soyad" onchange="saveToLocal(true)"></div>
+        <div class="input-group"><label>Yaş:</label><input type="number" id="pAge" onchange="saveToLocal(true)"></div>
+        <div class="input-group">
             <label>Cinsiyet:</label>
             <select id="pGender" onchange="saveToLocal(true)">
                 <option value="">Seçiniz...</option>
@@ -165,7 +183,7 @@
         </div>
         <div class="input-group"><label>Eğitim:</label><select id="pEdu" onchange="saveToLocal(true)"><option value="0-7">0-7 Yıl</option><option value="8-19">8-19 Yıl</option></select></div>
         <div class="input-group"><label>Tarih:</label><input type="date" id="pDate" onchange="saveToLocal(true)"></div>
-        <div class="input-group no-print"><label>Uygulayan:</label><input type="text" id="assessorName" onchange="saveToLocal(true)"></div>
+        <div class="input-group"><label>Uygulayan:</label><input type="text" id="assessorName" onchange="saveToLocal(true)"></div>
         <div class="input-group"><label>Sayı Menzili:</label><input type="number" id="digitSpan" onchange="saveToLocal(true)"></div>
     </div>
 
@@ -175,20 +193,20 @@
                 <tr>
                     <th rowspan="2">Kelimeler</th>
                     <th colspan="10">Öğrenme Denemeleri</th>
-                    <th rowspan="2" style="background:var(--highlight-blue); width:50px;">
-                        <span class="print-text">Hatırlatma</span><button class="btn-start no-print" style="background:transparent; border-color:var(--blue-text); color:var(--blue-text);" onclick="startTrial('H')">Hatırlatma</button>
+                    <th rowspan="2" style="background:var(--highlight-blue); width:45px;">
+                        <span class="print-text">Hatır.</span><button class="btn-start no-print" style="background:transparent; border-color:var(--blue-text); color:var(--blue-text);" onclick="startTrial('H')">Hatırlatma</button>
                     </th>
-                    <th rowspan="2" style="background:var(--highlight-yellow); width:50px;">
+                    <th rowspan="2" style="background:var(--highlight-yellow); width:45px;">
                         <span class="print-text">USB</span><button class="btn-start no-print" style="color:var(--warning);" onclick="startTrial('USB')">USB</button>
                     </th>
-                    <th rowspan="2" style="background:var(--highlight-purple); width:50px;">
-                        <span class="print-text">Tanıma(USB)</span><button class="btn-start no-print" style="color:var(--purple-text);" onclick="startTrial('TANIMA')">Tanıma</button>
+                    <th rowspan="2" style="background:var(--highlight-purple); width:45px;">
+                        <span class="print-text">Tanıma</span><button class="btn-start no-print" style="color:var(--purple-text);" onclick="startTrial('TANIMA')">Tanıma</button>
                     </th>
-                    <th rowspan="2" style="background:var(--highlight-pink); width:60px;">
-                        <span class="print-text">45 Kelime</span><button class="btn-start no-print" style="background:transparent; border-color:var(--pink-text); color:var(--pink-text);" onclick="startTrial('TOPLU_TANIMA')">45 Kelime</button>
+                    <th rowspan="2" style="background:var(--highlight-pink); width:45px;">
+                        <span class="print-text">45 Kel.</span><button class="btn-start no-print" style="background:transparent; border-color:var(--pink-text); color:var(--pink-text);" onclick="startTrial('TOPLU_TANIMA')">45 Kelime</button>
                     </th>
-                    <th rowspan="2" style="background:var(--highlight-green); width:50px;">
-                        <span class="print-text">Z. Seçme</span><button class="btn-start no-print" style="background:transparent; border-color:var(--green-text); color:var(--green-text);" onclick="startTrial('ZORUNLU_SECME')">Z. Seçme</button>
+                    <th rowspan="2" style="background:var(--highlight-green); width:45px;">
+                        <span class="print-text">Z.Seç.</span><button class="btn-start no-print" style="background:transparent; border-color:var(--green-text); color:var(--green-text);" onclick="startTrial('ZORUNLU_SECME')">Z. Seçme</button>
                     </th>
                 </tr>
                 <tr id="tableHeaders"></tr>
@@ -200,19 +218,19 @@
         </table>
     </div>
 
-    <h3 style="margin-top: 30px; font-size: 16px;">Test Sonuçları</h3>
+    <h3 style="margin-top: 30px;">Test Sonuçları</h3>
     <div class="results-grid">
-        <div class="result-card">Anlık Bellek: <span class="val" id="resAnlik">0</span></div>
-        <div class="result-card">Toplam Öğrenme: <span class="val" id="resToplam">0</span></div>
-        <div class="result-card">En Yüksek: <span class="val" id="resEnYuksek">0</span></div>
-        <div class="result-card" style="border-top: 3px solid var(--warning);">USB: <span class="val" id="resUSB" style="color:var(--warning);">0</span></div>
-        <div class="result-card" style="border-top: 3px solid var(--pink-text);">Serbest Doğru: <span class="val" id="resTopluT" style="color:var(--pink-text);">0</span></div>
-        <div class="result-card" style="border-top: 3px solid var(--danger);">Serbest Yanlış: <span class="val" id="resTopluY" style="color:var(--danger);">0</span></div>
-        <div class="result-card" style="border-top: 3px solid var(--purple-text);">Nihai Tanıma (+T): <span class="val" id="resTanima" style="color:var(--purple-text);">0</span></div>
-        <div class="result-card" style="border-top: 3px solid var(--danger);">Nihai Tanıma (-Y): <span class="val" id="resYanlisTanima" style="color:var(--danger);">0</span></div>
+        <div class="result-card"><span>Anlık Bellek:</span> <span class="val" id="resAnlik">0</span></div>
+        <div class="result-card"><span>Toplam Öğrenme:</span> <span class="val" id="resToplam">0</span></div>
+        <div class="result-card"><span>En Yüksek:</span> <span class="val" id="resEnYuksek">0</span></div>
+        <div class="result-card" style="border-top: 3px solid var(--warning); padding-top:4px;"><span>USB:</span> <span class="val" id="resUSB" style="color:var(--warning);">0</span></div>
+        <div class="result-card" style="border-top: 3px solid var(--pink-text); padding-top:4px;"><span>Serbest Doğru:</span> <span class="val" id="resTopluT" style="color:var(--pink-text);">0</span></div>
+        <div class="result-card" style="border-top: 3px solid var(--danger); padding-top:4px;"><span>Serbest Yanlış:</span> <span class="val" id="resTopluY" style="color:var(--danger);">0</span></div>
+        <div class="result-card" style="border-top: 3px solid var(--purple-text); padding-top:4px;"><span>Nihai Tanıma (+T):</span> <span class="val" id="resTanima" style="color:var(--purple-text);">0</span></div>
+        <div class="result-card" style="border-top: 3px solid var(--danger); padding-top:4px;"><span>Nihai Tanıma (-Y):</span> <span class="val" id="resYanlisTanima" style="color:var(--danger);">0</span></div>
     </div>
 
-    <h3 style="margin-top: 30px; font-size: 16px;">Otomatik Klinik Yorumlama (El Kitabı Normlarına Göre)</h3>
+    <h3 style="margin-top: 30px;">Otomatik Klinik Yorumlama (El Kitabı Normlarına Göre)</h3>
     <div class="interpretation-box" id="interpretationBox">
         <div id="interpretationText" style="color:var(--text-muted); font-style:italic;">Değerlendirme için testin tamamlanması ve hasta Yaş/Eğitim bilgisinin girilmesi bekleniyor...</div>
     </div>
@@ -222,7 +240,7 @@
     </div>
 
     <div class="reference-footer">
-        <b>Kaynakça & Bildirim:</b> Bu klinik asistan uygulaması, Prof. Dr. Öget Öktem Tanör tarafından geliştirilen <i>Öktem Sözel Bellek Süreçleri Testi (Öktem-SBST)</i> baz alınarak tasarlanmıştır. Test normları ve klinik hesaplama algoritmaları, <b>Türk Psikologlar Derneği Yayınları (2011) Öktem-SBST El Kitabı</b> referans alınarak kurgulanmıştır. Tüm bilimsel telif ve entelektüel haklar asıl eser sahiplerine aittir.
+        <b>Kaynakça & Bildirim:</b> Bu klinik asistan uygulaması, Prof. Dr. Öget Öktem Tanör tarafından geliştirilen <i>Öktem Sözel Bellek Süreçleri Testi (Öktem-SBST)</i> baz alınarak tasarlanmıştır. Test normları ve klinik hesaplama algoritmaları, <b>Türk Psikologlar Derneği Yayınları (2011) Öktem-SBST El Kitabı</b> referans alınarak kurgulanmıştır. Tüm bilimsel telif ve entelektüel haklar asıl eser sahiplerine aittir.[cite: 1]
         <div class="developer-credit">Dijital Uyarlama ve Geliştirme: İsmail Ürkmez</div>
         <div class="non-profit-note">Klinik pratiği kolaylaştırmak amacıyla, bağımsız ve gönüllü bir inisiyatif olarak geliştirilmiştir.</div>
     </div>
@@ -277,7 +295,7 @@
             intRow.innerHTML += `<td id="int-${i}"></td>`;
         }
         
-        intRow.innerHTML += `<td id="int-H" style="background:var(--highlight-blue);"></td><td id="int-USB" style="background:var(--highlight-yellow);"></td><td id="int-TANIMA" style="background:var(--highlight-purple);"></td><td id="int-TOPLU_TANIMA" style="background:var(--highlight-pink); color:var(--danger); font-size:10px; font-style:italic;" title="Serbest tanımadaki yanlışlar"></td><td id="int-ZORUNLU_SECME" style="background:var(--highlight-green);"></td>`;
+        intRow.innerHTML += `<td id="int-H" style="background:var(--highlight-blue);"></td><td id="int-USB" style="background:var(--highlight-yellow);"></td><td id="int-TANIMA" style="background:var(--highlight-purple);"></td><td id="int-TOPLU_TANIMA" style="background:var(--highlight-pink); color:var(--danger); font-size:10px; font-style:italic;"></td><td id="int-ZORUNLU_SECME" style="background:var(--highlight-green);"></td>`;
 
         words.forEach((w, idx) => {
             let r = `<tr><td class="word-cell">${w.k}</td>`;
@@ -888,6 +906,16 @@
         document.getElementById('printPatientName').innerText = document.getElementById('pName').value || "......................";
         document.getElementById('printDate').innerText = formattedDate;
         document.getElementById('printAssessor').innerText = document.getElementById('assessorName').value || "......................"; 
+        
+        let age = document.getElementById('pAge').value || "...";
+        let gender = document.getElementById('pGender').value || "...";
+        document.getElementById('printAgeGender').innerText = `${age} / ${gender}`;
+        
+        let eduSelect = document.getElementById('pEdu');
+        document.getElementById('printEdu').innerText = eduSelect.options[eduSelect.selectedIndex].text || "...";
+        
+        document.getElementById('printDigitSpan').innerText = document.getElementById('digitSpan').value || "...";
+
         window.print(); 
     }
 </script>
