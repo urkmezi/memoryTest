@@ -100,6 +100,7 @@
         }
 
         .print-only { display: none; }
+        .print-text { display: none; } /* <-- HATA BURADAYDI, EKLENDİ! */
         
         /* GÜVENLİ YAZDIRMA CSS AYARLARI */
         @media print {
@@ -912,12 +913,11 @@
             
             if(document.getElementById('printDigitSpan')) document.getElementById('printDigitSpan').innerText = document.getElementById('digitSpan') ? document.getElementById('digitSpan').value || "..." : "...";
 
-            // Hata önleyici zırh ve gecikme (DOM layout çakışmasını engeller)
             setTimeout(() => { window.print(); }, 100);
             
         } catch(e) {
             console.error("Yazdırma hatası:", e);
-            window.print(); // Her şeye rağmen yazdırmayı dene
+            window.print(); 
         }
     }
 </script>
