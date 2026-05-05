@@ -92,8 +92,9 @@
         .norm-table-info { font-size: 12px; color: var(--text-muted); background: var(--bg-panel); padding: 8px; border-radius: 4px; border: 1px dashed var(--border); margin-top: 10px; display: inline-block;}
 
         .reference-footer { margin-top: 40px; padding-top: 15px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+        .developer-credit { margin-top: 10px; font-weight: 600; color: var(--primary); }
+        .non-profit-note { font-style: italic; font-size: 11px; margin-top: 2px; }
 
-        /* Mobil Ekranlar İçin 3'lü Görünüm Ayarlamaları */
         @media (max-width: 500px) {
             .word-btn { font-size: 12px; padding: 10px 2px; min-height: 55px; }
         }
@@ -126,6 +127,7 @@
             .result-card .val { font-size: 12px; display: inline; margin-top: 0; color: #000 !important; }
             .interpretation-box { border: 1px solid #000; border-left: 4px solid #000; break-inside: avoid; }
             .reference-footer { margin-top: 20px; padding-top: 5px; font-size: 9px; }
+            .developer-credit { color: #000; }
         }
     </style>
 </head>
@@ -142,10 +144,10 @@
     </div>
 
     <div class="top-bar no-print">
-        <h2 style="font-size: 20px;">Klinik Kayıt Paneli (Yerel Mod)</h2>
+        <h2 style="font-size: 20px;">SBST Klinik Asistan</h2>
         <div class="cloud-actions">
             <button class="btn-cloud new-test" onclick="handleNewTest()">➕ Yeni</button>
-            <button class="btn-cloud save" onclick="saveToLocal(false)">💾 Cihaza Kaydet</button>
+            <button class="btn-cloud save" onclick="saveToLocal(false)">💾 Kaydet</button>
             <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌗 Tema</button>
         </div>
     </div>
@@ -221,6 +223,8 @@
 
     <div class="reference-footer">
         <b>Kaynakça & Bildirim:</b> Bu klinik asistan uygulaması, Prof. Dr. Öget Öktem Tanör tarafından geliştirilen <i>Öktem Sözel Bellek Süreçleri Testi (Öktem-SBST)</i> baz alınarak tasarlanmıştır. Test normları ve klinik hesaplama algoritmaları, <b>Türk Psikologlar Derneği Yayınları (2011) Öktem-SBST El Kitabı</b> referans alınarak kurgulanmıştır. Tüm bilimsel telif ve entelektüel haklar asıl eser sahiplerine aittir.
+        <div class="developer-credit">Dijital Uyarlama ve Geliştirme: İsmail Ürkmez</div>
+        <div class="non-profit-note">Klinik pratiği kolaylaştırmak amacıyla, bağımsız ve gönüllü bir inisiyatif olarak geliştirilmiştir.</div>
     </div>
 </div>
 
@@ -377,7 +381,6 @@
         document.getElementById('intrusionInput').value = intrusions[key] || "";
         document.getElementById('undoBtn').style.display = 'block';
         
-        // Varsayılan Grid Düzenini Temizle
         grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(130px, 1fr))'; 
 
         if (key === 'ZORUNLU_SECME') {
@@ -435,7 +438,6 @@
             document.getElementById('undoBtn').style.display = 'none'; 
             grid.style.display = 'grid'; tGrid.style.display = 'none';
             
-            // DÜZELTME: Ekran boyutu ne olursa olsun 45 kelimelik testi daima 3'lü dizilimde göster.
             grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
             
             all45Words.forEach(w => {
